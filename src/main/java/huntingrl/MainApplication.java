@@ -2,8 +2,8 @@ package huntingrl;
 
 import javax.swing.JFrame;
 import asciiPanel.AsciiPanel;
-import huntingrl.scenes.SceneController;
-import huntingrl.scenes.StartScene;
+import huntingrl.view.scene.SceneController;
+import huntingrl.view.scene.StartScene;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;

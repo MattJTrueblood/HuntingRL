@@ -1,4 +1,4 @@
-package huntingrl.scenes;
+package huntingrl.view.scene;
 
 import lombok.Builder;
 
