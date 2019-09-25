@@ -2,8 +2,9 @@ package huntingrl;
 
 import javax.swing.JFrame;
 import asciiPanel.AsciiPanel;
-import huntingrl.view.scene.SceneController;
-import huntingrl.view.scene.StartScene;
+import huntingrl.scene.SceneController;
+import huntingrl.scene.StartScene;
+import huntingrl.util.Constants;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -15,7 +16,7 @@ public class MainApplication extends JFrame implements KeyListener {
 
   private MainApplication() {
     super();
-    this.terminal = new AsciiPanel(120, 60);
+    this.terminal = new AsciiPanel(Constants.TERMINAL_WIDTH, Constants.TERMINAL_HEIGHT);
     this.add(terminal);
     this.pack();
 

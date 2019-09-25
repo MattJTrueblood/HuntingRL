@@ -1,4 +1,4 @@
-package huntingrl.view.scene;
+package huntingrl.scene;
 
 import asciiPanel.AsciiPanel;
 import lombok.NoArgsConstructor;
