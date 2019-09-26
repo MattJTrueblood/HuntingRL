@@ -20,14 +20,14 @@ public class MainApplication extends JFrame implements KeyListener {
     this.add(terminal);
     this.pack();
 
-    this.sceneController = new SceneController(new StartScene());
+    this.sceneController = new SceneController(new StartScene(terminal));
     this.addKeyListener(this);
     this.drawScene();
   }
 
   private void drawScene() {
     terminal.clear();
-    this.sceneController.drawScene(terminal);
+    this.sceneController.drawScene();
     this.repaint();
   }
 

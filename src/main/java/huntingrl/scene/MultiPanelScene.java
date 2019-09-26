@@ -3,7 +3,6 @@ package huntingrl.scene;
 import asciiPanel.AsciiPanel;
 import huntingrl.module.panel.DrawPanel;
 
-import java.awt.*;
 import java.awt.event.InputEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -11,6 +10,11 @@ import java.util.List;
 
 public abstract class MultiPanelScene implements Scene {
     private List<DrawPanel> panels = new ArrayList<>();
+    protected AsciiPanel terminal;
+
+    public MultiPanelScene(AsciiPanel terminal) {
+        this.terminal = terminal;
+    }
 
     public void addPanel(DrawPanel panel) {
         panels.add(panel);
@@ -25,9 +29,9 @@ public abstract class MultiPanelScene implements Scene {
         panels.sort(Comparator.comparing(DrawPanel::getZIndex));
     }
 
-    public void draw(AsciiPanel terminal) {
+    public void draw() {
         for(DrawPanel drawPanel : panels) {
-            drawPanel.draw(terminal);
+            drawPanel.draw();
         }
     }
 

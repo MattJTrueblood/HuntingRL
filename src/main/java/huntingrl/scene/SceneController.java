@@ -26,7 +26,7 @@ public class SceneController {
         }
     }
 
-    public void drawScene(AsciiPanel terminal) {
-        this.currentScene.draw(terminal);
+    public void drawScene() {
+        this.currentScene.draw();
     }
 }
