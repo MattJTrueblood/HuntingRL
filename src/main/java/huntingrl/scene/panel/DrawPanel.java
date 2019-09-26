@@ -1,7 +1,6 @@
-package huntingrl.module.panel;
+package huntingrl.scene.panel;
 
 import asciiPanel.AsciiPanel;
-import huntingrl.module.Module;
 import huntingrl.scene.SceneChangeEvent;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,12 +8,12 @@ import lombok.Setter;
 import java.awt.event.InputEvent;
 
 /**
- * A DrawPanel is a module that represents a specific fixed area of a screen to draw to.  This can be used for game
+ * A DrawPanel is a panel that represents a specific fixed area of a screen to draw to.  This can be used for game
  * windows, ui portions of the screen, and menu popups, for example.
  */
 @Getter
 @Setter
-public class DrawPanel implements Module {
+public class DrawPanel implements Panel {
 
     private AsciiPanel terminal;
     private final int x;

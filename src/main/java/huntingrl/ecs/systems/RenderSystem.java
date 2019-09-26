@@ -20,7 +20,7 @@ public class RenderSystem extends IteratingSystem {
     public void processEntity(Entity entity, float DeltaTime) {
         PositionComponent position = ComponentMappers.positionMapper.get(entity);
         GraphicsComponent graphics = ComponentMappers.graphicsMapper.get(entity);
-        terminal.write(graphics.character, position.x, position.y, graphics.fgColor, graphics.bgColor);
+        terminal.write(graphics.getCharacter(), position.getX(), position.getY(), graphics.getFgColor(), graphics.getBgColor());
     }
 }
 

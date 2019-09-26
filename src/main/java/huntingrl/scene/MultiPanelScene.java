@@ -1,7 +1,7 @@
 package huntingrl.scene;
 
 import asciiPanel.AsciiPanel;
-import huntingrl.module.panel.DrawPanel;
+import huntingrl.scene.panel.DrawPanel;
 
 import java.awt.event.InputEvent;
 import java.util.ArrayList;

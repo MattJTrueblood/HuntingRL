@@ -1,10 +1,13 @@
-package huntingrl.module.panel;
+package huntingrl.scene.panel;
 
 import asciiPanel.AsciiPanel;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import huntingrl.ecs.components.GraphicsComponent;
+import huntingrl.ecs.components.PlayerComponent;
 import huntingrl.ecs.components.PositionComponent;
+import huntingrl.ecs.systems.PlayerControlSystem;
+import huntingrl.ecs.systems.QuitMenuControlSystem;
 import huntingrl.ecs.systems.RenderSystem;
 import huntingrl.scene.SceneChangeEvent;
 
@@ -27,12 +30,22 @@ public class MainGamePanel extends DrawPanel {
     private void init() {
         gameEngine = new Engine();
         gameEngine.addSystem(new RenderSystem(this.getTerminal()));
+        gameEngine.addSystem(new QuitMenuControlSystem(this.getTerminal()));
+        gameEngine.addSystem(new PlayerControlSystem());
         addPlayer();
         addABunchOfTrees();
     }
 
     private void addPlayer() {
-        //todo
+        Entity player = new Entity();
+        player.add(GraphicsComponent.builder()
+                .character((char) 64)
+                .bgColor(Color.BLACK)
+                .fgColor(Color.YELLOW)
+                .build());
+        player.add(new PlayerComponent());
+        player.add(PositionComponent.builder().x(getWidth() / 2).y(getHeight() / 2).build());
+        gameEngine.addEntity(player);
     }
 
     private void addABunchOfTrees() {
@@ -52,7 +65,9 @@ public class MainGamePanel extends DrawPanel {
     }
 
     public SceneChangeEvent receiveInput(InputEvent inputEvent) {
-        return null;
+        gameEngine.getSystem(PlayerControlSystem.class).receiveInput(inputEvent);
+        //TODO:  figure out how to handle multiple systems that can call scene changes
+        return gameEngine.getSystem(QuitMenuControlSystem.class).receiveInput(inputEvent);
     }
 
     public void draw() {

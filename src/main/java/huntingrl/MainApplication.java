@@ -3,7 +3,7 @@ package huntingrl;
 import javax.swing.JFrame;
 import asciiPanel.AsciiPanel;
 import huntingrl.scene.SceneController;
-import huntingrl.scene.StartScene;
+import huntingrl.scene.menu.StartScene;
 import huntingrl.util.Constants;
 
 import java.awt.event.KeyEvent;

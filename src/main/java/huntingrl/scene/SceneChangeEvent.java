@@ -10,4 +10,6 @@ public class SceneChangeEvent {
     public boolean deleteOldScene = true;
     @Builder.Default
     public boolean goToOldScene = false;
+    @Builder.Default
+    public boolean quitApplication = false;
 }
