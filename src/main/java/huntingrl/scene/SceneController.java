@@ -1,32 +1,39 @@
 package huntingrl.scene;
 
-import asciiPanel.AsciiPanel;
-
 import java.awt.event.InputEvent;
+import java.util.Stack;
 
 public class SceneController {
     private Scene currentScene;
-    private Scene savedOldScene;
+    private Stack<Scene> savedOldScenes;
 
     public SceneController(Scene startingScene) {
         currentScene = startingScene;
+        savedOldScenes = new Stack<>();
+        currentScene.init();
     }
 
     public void receiveEvent(InputEvent event) {
         SceneChangeEvent sceneChangeEvent = currentScene.receiveInput(event);
         if(sceneChangeEvent != null) {
-            if(!sceneChangeEvent.deleteOldScene) {
-                savedOldScene = currentScene;
+            if(sceneChangeEvent.quitApplication) {
+                System.exit(0);
             }
-            if(sceneChangeEvent.goToOldScene) {
-                currentScene = savedOldScene;
+            if(sceneChangeEvent.saveOldScene) {
+                savedOldScenes.push(currentScene);
+            } else {
+                savedOldScenes.empty();
+            }
+            if(sceneChangeEvent.goToSavedOldScene) {
+                currentScene = savedOldScenes.pop();
             } else {
                 currentScene = sceneChangeEvent.scene;
+                currentScene.init();
             }
         }
     }
 
-    public void drawScene(AsciiPanel terminal) {
-        this.currentScene.draw(terminal);
+    public void drawScene() {
+        this.currentScene.draw();
     }
 }

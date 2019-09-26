@@ -3,7 +3,7 @@ package huntingrl;
 import javax.swing.JFrame;
 import asciiPanel.AsciiPanel;
 import huntingrl.scene.SceneController;
-import huntingrl.scene.StartScene;
+import huntingrl.scene.menu.StartScene;
 import huntingrl.util.Constants;
 
 import java.awt.event.KeyEvent;
@@ -20,14 +20,14 @@ public class MainApplication extends JFrame implements KeyListener {
     this.add(terminal);
     this.pack();
 
-    this.sceneController = new SceneController(new StartScene());
+    this.sceneController = new SceneController(new StartScene(terminal));
     this.addKeyListener(this);
     this.drawScene();
   }
 
   private void drawScene() {
     terminal.clear();
-    this.sceneController.drawScene(terminal);
+    this.sceneController.drawScene();
     this.repaint();
   }
 

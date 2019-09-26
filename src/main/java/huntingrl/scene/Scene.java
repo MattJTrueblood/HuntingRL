@@ -6,5 +6,6 @@ import java.awt.event.InputEvent;
 
 public interface Scene {
     public SceneChangeEvent receiveInput(InputEvent inputEvent);
-    public void draw(AsciiPanel terminal);
+    public void init();
+    public void draw();
 }
