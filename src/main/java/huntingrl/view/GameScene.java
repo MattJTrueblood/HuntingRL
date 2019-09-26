@@ -1,7 +1,7 @@
-package huntingrl.scene;
+package huntingrl.view;
 
 import asciiPanel.AsciiPanel;
-import huntingrl.scene.panel.MainGamePanel;
+import huntingrl.view.panel.MainGamePanel;
 import huntingrl.util.Constants;
 
 public class GameScene extends MultiPanelScene {
@@ -11,6 +11,6 @@ public class GameScene extends MultiPanelScene {
     }
 
     public void init() {
-        addPanel( new MainGamePanel(terminal, 0,0, Constants.TERMINAL_WIDTH, Constants.TERMINAL_HEIGHT));
+        addPanel( new MainGamePanel(terminal, 10,10, Constants.TERMINAL_WIDTH - 20, Constants.TERMINAL_HEIGHT - 20));
     }
 }

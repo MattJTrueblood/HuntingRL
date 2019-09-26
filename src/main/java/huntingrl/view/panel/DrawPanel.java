@@ -1,10 +1,11 @@
-package huntingrl.scene.panel;
+package huntingrl.view.panel;
 
 import asciiPanel.AsciiPanel;
-import huntingrl.scene.SceneChangeEvent;
+import huntingrl.view.SceneChangeEvent;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.awt.*;
 import java.awt.event.InputEvent;
 
 /**
@@ -18,6 +19,7 @@ public class DrawPanel implements Panel {
     private AsciiPanel terminal;
     private final PanelBounds bounds;
     private final int zIndex;
+    private Color baseColor = Color.BLACK;
 
     public DrawPanel(AsciiPanel terminal, int x, int y, int width, int height, int zIndex) {
         this.terminal = terminal;
@@ -35,7 +37,7 @@ public class DrawPanel implements Panel {
     public void draw() {
         for(int i = bounds.getX(); i < (bounds.getX() + bounds.getWidth()); i++) {
             for(int j = bounds.getY(); j < (bounds.getY() + bounds.getHeight()); j++) {
-                terminal.write(Character.forDigit(zIndex, 16), i, j);
+                terminal.write((char) 0, i, j, baseColor, baseColor);
             }
         }
     }

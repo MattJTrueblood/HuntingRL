@@ -7,14 +7,17 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import huntingrl.ecs.ComponentMappers;
 import huntingrl.ecs.components.GraphicsComponent;
 import huntingrl.ecs.components.PositionComponent;
+import huntingrl.view.panel.PanelBounds;
 
 public class RenderSystem extends IteratingSystem {
 
     private AsciiPanel terminal;
+    private PanelBounds bounds;
 
-    public RenderSystem(AsciiPanel terminal) {
+    public RenderSystem(AsciiPanel terminal, PanelBounds bounds) {
         super(Family.all(PositionComponent.class, GraphicsComponent.class).get());
         this.terminal = terminal;
+        this.bounds = bounds;
     }
 
     public void processEntity(Entity entity, float DeltaTime) {

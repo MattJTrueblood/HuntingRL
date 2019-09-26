@@ -1,8 +1,8 @@
-package huntingrl.scene.menu;
+package huntingrl.view.menu;
 
 import asciiPanel.AsciiPanel;
-import huntingrl.scene.Scene;
-import huntingrl.scene.SceneChangeEvent;
+import huntingrl.view.Scene;
+import huntingrl.view.SceneChangeEvent;
 import huntingrl.util.Constants;
 import lombok.Getter;
 import lombok.Setter;

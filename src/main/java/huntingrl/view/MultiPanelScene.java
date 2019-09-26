@@ -1,8 +1,10 @@
-package huntingrl.scene;
+package huntingrl.view;
 
 import asciiPanel.AsciiPanel;
-import huntingrl.scene.panel.DrawPanel;
+import huntingrl.util.Constants;
+import huntingrl.view.panel.DrawPanel;
 
+import java.awt.*;
 import java.awt.event.InputEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -14,6 +16,10 @@ public abstract class MultiPanelScene implements Scene {
 
     public MultiPanelScene(AsciiPanel terminal) {
         this.terminal = terminal;
+        //Add base panel
+        DrawPanel basePanel = new DrawPanel(terminal, 0, 0, Constants.TERMINAL_WIDTH, Constants.TERMINAL_HEIGHT, Integer.MIN_VALUE);
+        basePanel.setBaseColor(Color.GRAY);
+        addPanel(basePanel);
     }
 
     public void addPanel(DrawPanel panel) {

@@ -1,4 +1,4 @@
-package huntingrl.scene.panel;
+package huntingrl.view.panel;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

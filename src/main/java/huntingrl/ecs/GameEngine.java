@@ -8,8 +8,8 @@ import huntingrl.ecs.components.PlayerComponent;
 import huntingrl.ecs.components.PositionComponent;
 import huntingrl.ecs.systems.InputSystem;
 import huntingrl.ecs.systems.RenderSystem;
-import huntingrl.scene.SceneChangeEvent;
-import huntingrl.scene.panel.PanelBounds;
+import huntingrl.view.SceneChangeEvent;
+import huntingrl.view.panel.PanelBounds;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
@@ -23,7 +23,7 @@ public class GameEngine {
     public GameEngine(AsciiPanel terminal, PanelBounds bounds) {
         this.bounds = bounds;
         gameEngine = new Engine();
-        gameEngine.addSystem(new RenderSystem(terminal));
+        gameEngine.addSystem(new RenderSystem(terminal, bounds));
         gameEngine.addSystem(new InputSystem(terminal));
         addPlayer();
         addABunchOfTrees();
