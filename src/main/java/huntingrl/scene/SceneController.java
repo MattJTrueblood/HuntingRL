@@ -1,13 +1,15 @@
 package huntingrl.scene;
 
 import java.awt.event.InputEvent;
+import java.util.Stack;
 
 public class SceneController {
     private Scene currentScene;
-    private Scene savedOldScene;
+    private Stack<Scene> savedOldScenes;
 
     public SceneController(Scene startingScene) {
         currentScene = startingScene;
+        savedOldScenes = new Stack<>();
         currentScene.init();
     }
 
@@ -18,10 +20,12 @@ public class SceneController {
                 System.exit(0);
             }
             if(sceneChangeEvent.saveOldScene) {
-                savedOldScene = currentScene;
+                savedOldScenes.push(currentScene);
+            } else {
+                savedOldScenes.empty();
             }
             if(sceneChangeEvent.goToSavedOldScene) {
-                currentScene = savedOldScene;
+                currentScene = savedOldScenes.pop();
             } else {
                 currentScene = sceneChangeEvent.scene;
                 currentScene.init();
