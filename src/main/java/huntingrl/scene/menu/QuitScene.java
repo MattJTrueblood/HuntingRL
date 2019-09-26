@@ -19,8 +19,8 @@ public class QuitScene extends MenuScene {
 
     private ArrayList<MenuItem> buildMenuItems() {
         MenuItem cancelItem = new MenuItem("cancel", SceneChangeEvent.builder()
-                .deleteOldScene(true)
-                .goToOldScene(true)
+                .saveOldScene(false)
+                .goToSavedOldScene(true)
                 .build());
         MenuItem quitItem = new MenuItem("quit", SceneChangeEvent.builder()
                 .quitApplication(true)

@@ -7,9 +7,9 @@ public class SceneChangeEvent {
     @Builder.Default
     public Scene scene = null;
     @Builder.Default
-    public boolean deleteOldScene = true;
+    public boolean saveOldScene = false;
     @Builder.Default
-    public boolean goToOldScene = false;
+    public boolean goToSavedOldScene = false;
     @Builder.Default
     public boolean quitApplication = false;
 }

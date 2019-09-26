@@ -20,8 +20,8 @@ public class StartScene extends MenuScene {
 
     private ArrayList<MenuItem> buildMenuItems() {
         MenuItem cancelItem = new MenuItem("start", SceneChangeEvent.builder()
-                .deleteOldScene(true)
-                .goToOldScene(false)
+                .saveOldScene(false)
+                .goToSavedOldScene(false)
                 .scene(new GameScene(getTerminal()))
                 .build());
         MenuItem quitItem = new MenuItem("quit", SceneChangeEvent.builder()

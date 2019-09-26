@@ -78,7 +78,7 @@ public class InputSystem extends EntitySystem {
     private SceneChangeEvent createQuitMenuSceneEvent() {
         return SceneChangeEvent.builder()
                 .scene(new QuitScene(terminal))
-                .deleteOldScene(false)
+                .saveOldScene(true)
                 .build();
     }
 
