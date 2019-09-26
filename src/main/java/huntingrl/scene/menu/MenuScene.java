@@ -14,7 +14,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class MenuScene implements Scene {
+public abstract class MenuScene implements Scene {
 
     private static final int NAVIGATE_UP_KEYCODE = KeyEvent.VK_UP;
     private static final int NAVIGATE_DOWN_KEYCODE = KeyEvent.VK_DOWN;
