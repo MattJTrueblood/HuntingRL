@@ -13,4 +13,5 @@ public class ViewFrameComponent implements Component {
     PanelBounds panelBounds;
     int offsetX;
     int offsetY;
+    double zoomLevel;
 }

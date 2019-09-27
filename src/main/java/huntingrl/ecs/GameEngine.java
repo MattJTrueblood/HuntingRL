@@ -39,7 +39,7 @@ public class GameEngine {
 
     private void addViewFrame() {
         Entity viewFrame = new Entity();
-        viewFrame.add(new ViewFrameComponent(bounds, 0, 0));
+        viewFrame.add(new ViewFrameComponent(bounds, 0, 0, 100));
         gameEngine.addEntity(viewFrame);
     }
 
