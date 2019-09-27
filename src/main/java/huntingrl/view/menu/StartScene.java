@@ -1,13 +1,14 @@
-package huntingrl.scene.menu;
+package huntingrl.view.menu;
 
 import asciiPanel.AsciiPanel;
-import huntingrl.scene.SceneChangeEvent;
+import huntingrl.view.GameScene;
+import huntingrl.view.SceneChangeEvent;
 
 import java.util.ArrayList;
 
-public class QuitScene extends MenuScene {
+public class StartScene extends MenuScene {
 
-    public QuitScene(AsciiPanel terminal) {
+    public StartScene(AsciiPanel terminal) {
         super(terminal);
     }
 
@@ -18,9 +19,10 @@ public class QuitScene extends MenuScene {
     }
 
     private ArrayList<MenuItem> buildMenuItems() {
-        MenuItem cancelItem = new MenuItem("cancel", SceneChangeEvent.builder()
+        MenuItem cancelItem = new MenuItem("start", SceneChangeEvent.builder()
                 .saveOldScene(false)
-                .goToSavedOldScene(true)
+                .goToSavedOldScene(false)
+                .scene(new GameScene(getTerminal()))
                 .build());
         MenuItem quitItem = new MenuItem("quit", SceneChangeEvent.builder()
                 .quitApplication(true)

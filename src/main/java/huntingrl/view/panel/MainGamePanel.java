@@ -1,9 +1,10 @@
-package huntingrl.scene.panel;
+package huntingrl.view.panel;
 
 import asciiPanel.AsciiPanel;
 import huntingrl.ecs.GameEngine;
-import huntingrl.scene.SceneChangeEvent;
+import huntingrl.view.SceneChangeEvent;
 
+import java.awt.*;
 import java.awt.event.InputEvent;
 
 /**
@@ -15,6 +16,7 @@ public class MainGamePanel extends DrawPanel {
 
     public MainGamePanel(AsciiPanel terminal, int x, int y, int width, int height) {
         super(terminal, x, y, width, height, 0);
+        setBaseColor(Color.BLACK);
         mainGameEngine = new GameEngine(terminal, this.getBounds());
     }
 
@@ -25,6 +27,7 @@ public class MainGamePanel extends DrawPanel {
 
     @Override
     public void draw() {
+        super.draw();
         mainGameEngine.render();
     }
 

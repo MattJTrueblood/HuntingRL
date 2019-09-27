@@ -1,6 +1,4 @@
-package huntingrl.scene;
-
-import asciiPanel.AsciiPanel;
+package huntingrl.view;
 
 import java.awt.event.InputEvent;
 

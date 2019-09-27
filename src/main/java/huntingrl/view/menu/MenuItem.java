@@ -1,6 +1,6 @@
-package huntingrl.scene.menu;
+package huntingrl.view.menu;
 
-import huntingrl.scene.SceneChangeEvent;
+import huntingrl.view.SceneChangeEvent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
