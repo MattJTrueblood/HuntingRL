@@ -4,15 +4,10 @@ import com.flowpowered.noise.Noise;
 import com.flowpowered.noise.NoiseQuality;
 import lombok.Getter;
 
-import java.util.stream.DoubleStream;
-import java.util.stream.IntStream;
-
 @Getter
 public class World {
 
-    private int seed;
-    //private static final int WORLD_HEIGHT = 100;
-    //private static final int WORLD_WIDTH = 100;
+    private final int seed;
 
     private static final double[] NOISE_FREQUENCIES = {8, 16, 32, 64, 128};
     private static final double[] NOISE_AMPLITUDES = {0.5, 0.25, 0.125, 0.0625, 0.03125}; //try not to let the sum of these exceed 1.0
@@ -31,7 +26,7 @@ public class World {
         double elevationAtPoint = 0;
         for(int i = 0; i < NOISE_FREQUENCIES.length; i++) {
             elevationAtPoint += NOISE_AMPLITUDES[i] * Noise.gradientCoherentNoise3D(
-                    x * NOISE_FREQUENCIES[i], y * NOISE_FREQUENCIES[i], 0, seed, NoiseQuality.BEST);
+                    x * NOISE_FREQUENCIES[i], y * NOISE_FREQUENCIES[i], 0, seed, NoiseQuality.FAST);
         }
         elevationAtPoint = Math.pow(elevationAtPoint, NOISE_REDISTRIBUTION_FACTOR);
 
@@ -40,7 +35,6 @@ public class World {
     }
 
     public boolean pointOutOfBounds(int x, int y) {
-        //return x < 0 || y < 0 || x >= WORLD_WIDTH || y >= WORLD_HEIGHT;
         return false;
     }
 }
