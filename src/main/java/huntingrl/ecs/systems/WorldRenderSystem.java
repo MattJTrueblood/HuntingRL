@@ -41,10 +41,14 @@ public class WorldRenderSystem extends EntitySystem {
                     //render world tile
                     WorldPoint pointAtIJ = worldComponent.getWorld()
                             .pointAt(i + viewFrameComponent.getOffsetX(), j + viewFrameComponent.getOffsetY());
-                    float pointElevationFactor = ((float) pointAtIJ.getElevation()) / ((float) 10);
-                    terminal.write((char) 35, viewFrameComponent.getPanelBounds().getX() + i,
+                    int pointElevationFactor = pointAtIJ.getElevation();
+                    Color terrainColor = pointElevationFactor < 50
+                            ? new Color(0, 0, 255)
+                            : new Color(0, pointElevationFactor, 0);
+
+                    terminal.write((char) 0, viewFrameComponent.getPanelBounds().getX() + i,
                             viewFrameComponent.getPanelBounds().getY() + j,
-                            Color.GRAY, new Color(0, pointElevationFactor, 0));
+                            Color.GRAY, terrainColor);
                 }
             }
         }

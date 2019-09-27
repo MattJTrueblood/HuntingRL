@@ -36,10 +36,17 @@ public class RenderSystem extends IteratingSystem {
             position.getX() < viewFrame.getOffsetX() + viewFrame.getPanelBounds().getWidth() &&
             position.getY() < viewFrame.getOffsetY() + viewFrame.getPanelBounds().getHeight()) {
             //Entity is in frame, render it
-            terminal.write(graphics.getCharacter(),
-                    position.getX() + viewFrame.getPanelBounds().getX() - viewFrame.getOffsetX(),
-                    position.getY() + viewFrame.getPanelBounds().getY() - viewFrame.getOffsetY(),
-                    graphics.getFgColor(), graphics.getBgColor());
+            if(graphics.getBgColor() == null) {
+                terminal.write(graphics.getCharacter(),
+                        position.getX() + viewFrame.getPanelBounds().getX() - viewFrame.getOffsetX(),
+                        position.getY() + viewFrame.getPanelBounds().getY() - viewFrame.getOffsetY(),
+                        graphics.getFgColor());
+            } else {
+                terminal.write(graphics.getCharacter(),
+                        position.getX() + viewFrame.getPanelBounds().getX() - viewFrame.getOffsetX(),
+                        position.getY() + viewFrame.getPanelBounds().getY() - viewFrame.getOffsetY(),
+                        graphics.getFgColor(), graphics.getBgColor());
+            }
         }
 
     }

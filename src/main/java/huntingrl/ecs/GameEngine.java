@@ -47,7 +47,6 @@ public class GameEngine {
         Entity player = new Entity();
         player.add(GraphicsComponent.builder()
                 .character((char) 64)
-                .bgColor(Color.BLACK)
                 .fgColor(Color.YELLOW)
                 .build());
         player.add(new PlayerComponent());
