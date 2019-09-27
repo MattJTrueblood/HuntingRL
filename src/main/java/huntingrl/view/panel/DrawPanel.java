@@ -30,7 +30,7 @@ public class DrawPanel implements Panel {
     public SceneChangeEvent receiveInput(InputEvent event) {
         return null;
     }
-    
+
     public void draw() {
         for(int i = bounds.getX(); i < (bounds.getX() + bounds.getWidth()); i++) {
             for(int j = bounds.getY(); j < (bounds.getY() + bounds.getHeight()); j++) {

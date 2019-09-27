@@ -5,10 +5,10 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.utils.ImmutableArray;
 import huntingrl.ecs.ComponentMappers;
 import huntingrl.ecs.components.PlayerComponent;
 import huntingrl.ecs.components.PositionComponent;
+import huntingrl.ecs.components.ViewFrameComponent;
 import huntingrl.view.SceneChangeEvent;
 import huntingrl.view.menu.QuitScene;
 
@@ -23,7 +23,8 @@ public class InputSystem extends EntitySystem {
     private static final int RIGHT_KEYCODE = KeyEvent.VK_RIGHT;
     private static final int QUIT_KEYCODE = KeyEvent.VK_ESCAPE;
 
-    private ImmutableArray<Entity> playerEntities;
+    private Entity playerEntity;
+    private ViewFrameComponent viewFrame;
 
     private AsciiPanel terminal;
 
@@ -32,34 +33,34 @@ public class InputSystem extends EntitySystem {
     }
 
     public void addedToEngine(Engine engine) {
-        playerEntities = engine.getEntitiesFor(Family.all(PlayerComponent.class, PositionComponent.class).get());
+        playerEntity = engine.getEntitiesFor(Family.all(PlayerComponent.class, PositionComponent.class).get()).first();
+        viewFrame = engine.getEntitiesFor(Family.all(ViewFrameComponent.class).get()).first().getComponent(ViewFrameComponent.class);
+        centerViewFrameOnPlayer();
     }
 
     public SceneChangeEvent receiveInput(InputEvent event) {
-        for(Entity playerEntity: playerEntities) {
-            if(event instanceof KeyEvent) {
-                return handleKeyInputForPlayer((KeyEvent) event, playerEntity);
-            }
-            else if (event instanceof MouseEvent) {
-                return handleMouseInputForPlayer((MouseEvent) event, playerEntity);
-            }
+        if(event instanceof KeyEvent) {
+            return handleKeyInputForPlayer((KeyEvent) event);
+        }
+        else if (event instanceof MouseEvent) {
+            return handleMouseInputForPlayer((MouseEvent) event);
         }
         return null;
     }
 
-    private SceneChangeEvent handleKeyInputForPlayer(KeyEvent event, Entity playerEntity) {
+    private SceneChangeEvent handleKeyInputForPlayer(KeyEvent event) {
         switch(event.getKeyCode()) {
             case UP_KEYCODE:
-                movePlayer( playerEntity, 0, -1);
+                movePlayer(0, -1);
                 break;
             case DOWN_KEYCODE:
-                movePlayer( playerEntity, 0, 1);
+                movePlayer(0, 1);
                 break;
             case LEFT_KEYCODE:
-                movePlayer( playerEntity, -1, 0);
+                movePlayer(-1, 0);
                 break;
             case RIGHT_KEYCODE:
-                movePlayer( playerEntity, 1, 0);
+                movePlayer(1, 0);
                 break;
             case QUIT_KEYCODE:
                 return createQuitMenuSceneEvent();
@@ -67,10 +68,21 @@ public class InputSystem extends EntitySystem {
         return null;
     }
 
-    private void movePlayer(Entity playerEntity, int dx, int dy) {
+    private void movePlayer(int dx, int dy) {
         PositionComponent positionComponent = ComponentMappers.positionMapper.get(playerEntity);
         positionComponent.setX(positionComponent.getX() + dx);
         positionComponent.setY(positionComponent.getY() + dy);
+        centerViewFrameOnLocation(positionComponent.getX(), positionComponent.getY());
+    }
+
+    private void centerViewFrameOnLocation(int playerX, int playerY) {
+        viewFrame.setOffsetX(playerX - (viewFrame.getPanelBounds().getWidth() / 2));
+        viewFrame.setOffsetY(playerY - (viewFrame.getPanelBounds().getHeight() / 2));
+    }
+
+    private void centerViewFrameOnPlayer() {
+        PositionComponent positionComponent = ComponentMappers.positionMapper.get(playerEntity);
+        centerViewFrameOnLocation(positionComponent.getX(), positionComponent.getY());
     }
 
     private SceneChangeEvent createQuitMenuSceneEvent() {
@@ -80,7 +92,7 @@ public class InputSystem extends EntitySystem {
                 .build();
     }
 
-    private SceneChangeEvent handleMouseInputForPlayer(MouseEvent event, Entity playerEntity) {
+    private SceneChangeEvent handleMouseInputForPlayer(MouseEvent event) {
         //none right now
         return null;
     }

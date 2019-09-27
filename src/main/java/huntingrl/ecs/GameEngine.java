@@ -3,13 +3,13 @@ package huntingrl.ecs;
 import asciiPanel.AsciiPanel;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import huntingrl.ecs.components.GraphicsComponent;
-import huntingrl.ecs.components.PlayerComponent;
-import huntingrl.ecs.components.PositionComponent;
+import huntingrl.ecs.components.*;
 import huntingrl.ecs.systems.InputSystem;
 import huntingrl.ecs.systems.RenderSystem;
+import huntingrl.ecs.systems.WorldRenderSystem;
 import huntingrl.view.SceneChangeEvent;
 import huntingrl.view.panel.PanelBounds;
+import huntingrl.world.World;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
@@ -23,10 +23,24 @@ public class GameEngine {
     public GameEngine(AsciiPanel terminal, PanelBounds bounds) {
         this.bounds = bounds;
         gameEngine = new Engine();
-        gameEngine.addSystem(new RenderSystem(terminal, bounds));
-        gameEngine.addSystem(new InputSystem(terminal));
+        addViewFrame();
+        addWorld();
         addPlayer();
-        addABunchOfTrees();
+        gameEngine.addSystem(new WorldRenderSystem(100,terminal));
+        gameEngine.addSystem(new RenderSystem(101, terminal));
+        gameEngine.addSystem(new InputSystem(terminal));
+    }
+
+    private void addWorld() {
+        Entity world = new Entity();
+        world.add(new WorldComponent(new World(ThreadLocalRandom.current().nextInt())));
+        gameEngine.addEntity(world);
+    }
+
+    private void addViewFrame() {
+        Entity viewFrame = new Entity();
+        viewFrame.add(new ViewFrameComponent(bounds, 0, 0));
+        gameEngine.addEntity(viewFrame);
     }
 
     private void addPlayer() {
@@ -37,24 +51,8 @@ public class GameEngine {
                 .fgColor(Color.YELLOW)
                 .build());
         player.add(new PlayerComponent());
-        player.add(PositionComponent.builder().x(bounds.getWidth() / 2).y(bounds.getHeight() / 2).build());
+        player.add(PositionComponent.builder().x(50).y(50).build());
         gameEngine.addEntity(player);
-    }
-
-    private void addABunchOfTrees() {
-        for(int i = 0; i < 100; i++) {
-            Entity tree = new Entity();
-            tree.add(GraphicsComponent.builder()
-                    .character((char) 5)
-                    .bgColor(Color.BLACK)
-                    .fgColor(Color.GREEN)
-                    .build());
-            tree.add(PositionComponent.builder()
-                    .x(ThreadLocalRandom.current().nextInt(bounds.getX(), bounds.getWidth() - 1))
-                    .y(ThreadLocalRandom.current().nextInt(bounds.getY(), bounds.getHeight() - 1))
-                    .build());
-            gameEngine.addEntity(tree);
-        }
     }
 
     public SceneChangeEvent receiveInput(InputEvent inputEvent) {
