@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 public class ViewFrameComponent implements Component {
     PanelBounds panelBounds;
-    int offsetX;
-    int offsetY;
-    double zoomLevel;
+    double offsetWorldX;
+    double offsetWorldY;
+    double tileSize; //length/height of tile in world coords.  Increase this to zoom out, decrease to zoom in.
 }

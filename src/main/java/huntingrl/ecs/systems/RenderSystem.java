@@ -3,12 +3,10 @@ package huntingrl.ecs.systems;
 import asciiPanel.AsciiPanel;
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.ashley.utils.ImmutableArray;
 import huntingrl.ecs.ComponentMappers;
 import huntingrl.ecs.components.GraphicsComponent;
 import huntingrl.ecs.components.PositionComponent;
 import huntingrl.ecs.components.ViewFrameComponent;
-import huntingrl.view.panel.PanelBounds;
 
 public class RenderSystem extends IteratingSystem {
 
@@ -31,20 +29,20 @@ public class RenderSystem extends IteratingSystem {
         PositionComponent position = ComponentMappers.positionMapper.get(entity);
         GraphicsComponent graphics = ComponentMappers.graphicsMapper.get(entity);
 
-        if(position.getX() >= viewFrame.getOffsetX() &&
-            position.getY() >= viewFrame.getOffsetY() &&
-            position.getX() < viewFrame.getOffsetX() + viewFrame.getPanelBounds().getWidth() &&
-            position.getY() < viewFrame.getOffsetY() + viewFrame.getPanelBounds().getHeight()) {
-            //Entity is in frame, render it
+        if(position.getX() >= viewFrame.getOffsetWorldX() &&
+            position.getY() >= viewFrame.getOffsetWorldY() &&
+            position.getX() < viewFrame.getOffsetWorldX() + (viewFrame.getPanelBounds().getWidth() * viewFrame.getTileSize()) &&
+            position.getY() < viewFrame.getOffsetWorldY() + (viewFrame.getPanelBounds().getHeight() * viewFrame.getTileSize())) {
+            //Entity is in frame, render it.  Make sure to convert properly between screen coords and world coords!!!
             if(graphics.getBgColor() == null) {
                 terminal.write(graphics.getCharacter(),
-                        position.getX() + viewFrame.getPanelBounds().getX() - viewFrame.getOffsetX(),
-                        position.getY() + viewFrame.getPanelBounds().getY() - viewFrame.getOffsetY(),
+                        viewFrame.getPanelBounds().getX() + (int) ((position.getX() - viewFrame.getOffsetWorldX()) / viewFrame.getTileSize()),
+                        viewFrame.getPanelBounds().getY() + (int) ((position.getY() - viewFrame.getOffsetWorldY()) / viewFrame.getTileSize()),
                         graphics.getFgColor());
             } else {
                 terminal.write(graphics.getCharacter(),
-                        position.getX() + viewFrame.getPanelBounds().getX() - viewFrame.getOffsetX(),
-                        position.getY() + viewFrame.getPanelBounds().getY() - viewFrame.getOffsetY(),
+                        viewFrame.getPanelBounds().getX() + (int) ((position.getX() - viewFrame.getOffsetWorldX()) / viewFrame.getTileSize()),
+                        viewFrame.getPanelBounds().getY() + (int) ((position.getY() - viewFrame.getOffsetWorldY()) / viewFrame.getTileSize()),
                         graphics.getFgColor(), graphics.getBgColor());
             }
         }

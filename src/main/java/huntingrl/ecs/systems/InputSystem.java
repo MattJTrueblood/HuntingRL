@@ -22,6 +22,8 @@ public class InputSystem extends EntitySystem {
     private static final int LEFT_KEYCODE = KeyEvent.VK_LEFT;
     private static final int RIGHT_KEYCODE = KeyEvent.VK_RIGHT;
     private static final int QUIT_KEYCODE = KeyEvent.VK_ESCAPE;
+    private static final int ZOOM_OUT_KEYCODE = KeyEvent.VK_1;
+    private static final int ZOOM_IN_KEYCODE = KeyEvent.VK_2;
 
     private Entity playerEntity;
     private ViewFrameComponent viewFrame;
@@ -62,6 +64,12 @@ public class InputSystem extends EntitySystem {
             case RIGHT_KEYCODE:
                 movePlayer(1, 0);
                 break;
+            case ZOOM_IN_KEYCODE:
+                applyZoom(0.5);
+                break;
+            case ZOOM_OUT_KEYCODE:
+                applyZoom(2.0);
+                break;
             case QUIT_KEYCODE:
                 return createQuitMenuSceneEvent();
         }
@@ -70,14 +78,20 @@ public class InputSystem extends EntitySystem {
 
     private void movePlayer(int dx, int dy) {
         PositionComponent positionComponent = ComponentMappers.positionMapper.get(playerEntity);
-        positionComponent.setX(positionComponent.getX() + dx);
-        positionComponent.setY(positionComponent.getY() + dy);
+        positionComponent.setX(positionComponent.getX() + (dx * viewFrame.getTileSize()));
+        positionComponent.setY(positionComponent.getY() + (dy * viewFrame.getTileSize()));
         centerViewFrameOnLocation(positionComponent.getX(), positionComponent.getY());
     }
 
-    private void centerViewFrameOnLocation(int playerX, int playerY) {
-        viewFrame.setOffsetX(playerX - (viewFrame.getPanelBounds().getWidth() / 2));
-        viewFrame.setOffsetY(playerY - (viewFrame.getPanelBounds().getHeight() / 2));
+    private void centerViewFrameOnLocation(double playerX, double playerY) {
+        viewFrame.setOffsetWorldX(playerX - ((viewFrame.getPanelBounds().getWidth() * viewFrame.getTileSize()) / 2));
+        viewFrame.setOffsetWorldY(playerY - ((viewFrame.getPanelBounds().getHeight() * viewFrame.getTileSize()) / 2));
+    }
+
+    private void applyZoom(double zoomModifier) {
+        viewFrame.setTileSize(viewFrame.getTileSize() * zoomModifier);
+        System.out.println(viewFrame.getTileSize());
+        centerViewFrameOnPlayer();
     }
 
     private void centerViewFrameOnPlayer() {

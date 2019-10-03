@@ -11,6 +11,6 @@ public class GameScene extends MultiPanelScene {
     }
 
     public void init() {
-        addPanel( new MainGamePanel(terminal, 10,10, Constants.TERMINAL_WIDTH - 20, Constants.TERMINAL_HEIGHT - 20));
+        addPanel( new MainGamePanel(terminal, 1,1, Constants.TERMINAL_WIDTH - 2, Constants.TERMINAL_HEIGHT - 2));
     }
 }
