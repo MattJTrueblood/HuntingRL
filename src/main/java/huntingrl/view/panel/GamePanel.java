@@ -4,6 +4,8 @@ import asciiPanel.AsciiPanel;
 import huntingrl.ecs.GameEngine;
 import huntingrl.view.RenderBuffer;
 import huntingrl.view.SceneChangeEvent;
+import huntingrl.world.World;
+import lombok.Builder;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
@@ -11,25 +13,29 @@ import java.awt.event.InputEvent;
 /**
  * The main view of the game, displaying the local world around the player.
  */
-public class MainGamePanel extends DrawPanel {
+public class GamePanel extends DrawPanel {
 
     private final GameEngine mainGameEngine;
+    private final boolean inputEnabled;
+    private final ViewFrame viewFrame;
 
-    public MainGamePanel(RenderBuffer buffer, int x, int y, int width, int height) {
+    public GamePanel(RenderBuffer buffer, int x, int y, int width, int height, GameEngine engine, double tileSize, boolean inputEnabled) {
         super(buffer, x, y, width, height, 0);
         setBaseColor(Color.BLACK);
-        mainGameEngine = new GameEngine(buffer, this.getBounds());
+        this.viewFrame = new ViewFrame(this.getBounds(), 0, 0, tileSize);
+        this.inputEnabled = inputEnabled;
+        mainGameEngine = engine;
     }
 
     @Override
     public SceneChangeEvent receiveInput(InputEvent event) {
-        return mainGameEngine.receiveInput(event);
+        return mainGameEngine.receiveInput(event, viewFrame, inputEnabled);
     }
 
     @Override
     public void draw() {
         super.draw();
-        mainGameEngine.render();
+        mainGameEngine.renderInView(this.viewFrame);
     }
 
 }

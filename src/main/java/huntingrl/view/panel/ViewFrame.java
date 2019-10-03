@@ -1,6 +1,5 @@
-package huntingrl.ecs.components;
+package huntingrl.view.panel;
 
-import com.badlogic.ashley.core.Component;
 import huntingrl.view.panel.PanelBounds;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +8,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class ViewFrameComponent implements Component {
+public class ViewFrame {
     PanelBounds panelBounds;
     double offsetWorldX;
     double offsetWorldY;
