@@ -1,22 +1,24 @@
 package huntingrl.ecs.systems;
 
-import asciiPanel.AsciiPanel;
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.systems.IteratingSystem;
 import huntingrl.ecs.ComponentMappers;
 import huntingrl.ecs.components.GraphicsComponent;
 import huntingrl.ecs.components.PositionComponent;
 import huntingrl.ecs.components.ViewFrameComponent;
+import huntingrl.view.RenderBuffer;
+
+import java.awt.*;
 
 public class RenderSystem extends IteratingSystem {
 
     private ViewFrameComponent viewFrame;
 
-    private AsciiPanel terminal;
+    private RenderBuffer buffer;
 
-    public RenderSystem(int priority, AsciiPanel terminal) {
+    public RenderSystem(int priority, RenderBuffer buffer) {
         super(Family.all(PositionComponent.class, GraphicsComponent.class).get(), priority);
-        this.terminal = terminal;
+        this.buffer = buffer;
     }
 
     @Override
@@ -35,18 +37,17 @@ public class RenderSystem extends IteratingSystem {
             position.getY() < viewFrame.getOffsetWorldY() + (viewFrame.getPanelBounds().getHeight() * viewFrame.getTileSize())) {
             //Entity is in frame, render it.  Make sure to convert properly between screen coords and world coords!!!
             if(graphics.getBgColor() == null) {
-                terminal.write(graphics.getCharacter(),
+                buffer.write(graphics.getCharacter(),
                         viewFrame.getPanelBounds().getX() + (int) ((position.getX() - viewFrame.getOffsetWorldX()) / viewFrame.getTileSize()),
                         viewFrame.getPanelBounds().getY() + (int) ((position.getY() - viewFrame.getOffsetWorldY()) / viewFrame.getTileSize()),
-                        graphics.getFgColor());
+                        graphics.getFgColor(), new Color(0f, 0f, 0f, 0f));
             } else {
-                terminal.write(graphics.getCharacter(),
+                buffer.write(graphics.getCharacter(),
                         viewFrame.getPanelBounds().getX() + (int) ((position.getX() - viewFrame.getOffsetWorldX()) / viewFrame.getTileSize()),
                         viewFrame.getPanelBounds().getY() + (int) ((position.getY() - viewFrame.getOffsetWorldY()) / viewFrame.getTileSize()),
                         graphics.getFgColor(), graphics.getBgColor());
             }
         }
-
     }
 }
 

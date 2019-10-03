@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import huntingrl.ecs.components.ViewFrameComponent;
 import huntingrl.ecs.components.WorldComponent;
+import huntingrl.view.RenderBuffer;
 import huntingrl.world.WorldPoint;
 
 import java.awt.*;
@@ -15,11 +16,11 @@ public class WorldRenderSystem extends EntitySystem {
     private WorldComponent worldComponent;
     private ViewFrameComponent viewFrameComponent;
 
-    private AsciiPanel terminal;
+    private RenderBuffer buffer;
 
-    public WorldRenderSystem(int priority, AsciiPanel terminal) {
+    public WorldRenderSystem(int priority, RenderBuffer buffer) {
         super(priority);
-        this.terminal = terminal;
+        this.buffer = buffer;
     }
 
     public void addedToEngine(Engine engine) {
@@ -39,7 +40,7 @@ public class WorldRenderSystem extends EntitySystem {
                         ? new Color(0, 0, 255)
                         : new Color(0, pointElevationFactor, 0);
 
-                terminal.write((char) 0, viewFrameComponent.getPanelBounds().getX() + i,
+                buffer.write((char) 0, viewFrameComponent.getPanelBounds().getX() + i,
                         viewFrameComponent.getPanelBounds().getY() + j,
                         Color.GRAY, terrainColor);
             }

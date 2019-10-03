@@ -7,6 +7,7 @@ import huntingrl.ecs.components.*;
 import huntingrl.ecs.systems.InputSystem;
 import huntingrl.ecs.systems.RenderSystem;
 import huntingrl.ecs.systems.WorldRenderSystem;
+import huntingrl.view.RenderBuffer;
 import huntingrl.view.SceneChangeEvent;
 import huntingrl.view.panel.PanelBounds;
 import huntingrl.world.World;
@@ -20,15 +21,15 @@ public class GameEngine {
     private Engine gameEngine;
     private PanelBounds bounds;
 
-    public GameEngine(AsciiPanel terminal, PanelBounds bounds) {
+    public GameEngine(RenderBuffer buffer, PanelBounds bounds) {
         this.bounds = bounds;
         gameEngine = new Engine();
         addViewFrame();
         addWorld();
         addPlayer();
-        gameEngine.addSystem(new WorldRenderSystem(100,terminal));
-        gameEngine.addSystem(new RenderSystem(101, terminal));
-        gameEngine.addSystem(new InputSystem(terminal));
+        gameEngine.addSystem(new WorldRenderSystem(100, buffer));
+        gameEngine.addSystem(new RenderSystem(101, buffer));
+        gameEngine.addSystem(new InputSystem(buffer));
     }
 
     private void addWorld() {
@@ -46,8 +47,8 @@ public class GameEngine {
     private void addPlayer() {
         Entity player = new Entity();
         player.add(GraphicsComponent.builder()
-                .character((char) 64)
-                .fgColor(Color.YELLOW)
+                .character((char) 2)
+                .fgColor(new Color(255, 255, 0, 255))
                 .build());
         player.add(new PlayerComponent());
         player.add(PositionComponent.builder().x(50).y(50).build());

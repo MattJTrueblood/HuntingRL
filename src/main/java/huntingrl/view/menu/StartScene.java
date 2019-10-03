@@ -2,14 +2,15 @@ package huntingrl.view.menu;
 
 import asciiPanel.AsciiPanel;
 import huntingrl.view.GameScene;
+import huntingrl.view.RenderBuffer;
 import huntingrl.view.SceneChangeEvent;
 
 import java.util.ArrayList;
 
 public class StartScene extends MenuScene {
 
-    public StartScene(AsciiPanel terminal) {
-        super(terminal);
+    public StartScene(RenderBuffer buffer) {
+        super(buffer);
     }
 
     @Override
@@ -22,7 +23,7 @@ public class StartScene extends MenuScene {
         MenuItem cancelItem = new MenuItem("start", SceneChangeEvent.builder()
                 .saveOldScene(false)
                 .goToSavedOldScene(false)
-                .scene(new GameScene(getTerminal()))
+                .scene(new GameScene(getBuffer()))
                 .build());
         MenuItem quitItem = new MenuItem("quit", SceneChangeEvent.builder()
                 .quitApplication(true)

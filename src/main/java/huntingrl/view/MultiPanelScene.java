@@ -12,12 +12,12 @@ import java.util.List;
 
 public abstract class MultiPanelScene implements Scene {
     private List<DrawPanel> panels = new ArrayList<>();
-    protected AsciiPanel terminal;
+    protected RenderBuffer buffer;
 
-    public MultiPanelScene(AsciiPanel terminal) {
-        this.terminal = terminal;
+    public MultiPanelScene(RenderBuffer buffer) {
+        this.buffer = buffer;
         //Add base panel
-        DrawPanel basePanel = new DrawPanel(terminal, 0, 0, Constants.TERMINAL_WIDTH, Constants.TERMINAL_HEIGHT, Integer.MIN_VALUE);
+        DrawPanel basePanel = new DrawPanel(buffer, 0, 0, Constants.TERMINAL_WIDTH, Constants.TERMINAL_HEIGHT, Integer.MIN_VALUE);
         basePanel.setBaseColor(Color.GRAY);
         addPanel(basePanel);
     }
@@ -36,9 +36,11 @@ public abstract class MultiPanelScene implements Scene {
     }
 
     public void draw() {
+        this.buffer.clearBuffer();
         for(DrawPanel drawPanel : panels) {
             drawPanel.draw();
         }
+        this.buffer.draw();
     }
 
     public SceneChangeEvent receiveInput(InputEvent inputEvent) {
