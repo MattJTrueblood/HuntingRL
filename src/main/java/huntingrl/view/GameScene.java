@@ -6,11 +6,11 @@ import huntingrl.util.Constants;
 
 public class GameScene extends MultiPanelScene {
 
-    public GameScene(AsciiPanel terminal) {
-        super(terminal);
+    public GameScene(RenderBuffer buffer) {
+        super(buffer);
     }
 
     public void init() {
-        addPanel( new MainGamePanel(terminal, 1,1, Constants.TERMINAL_WIDTH - 2, Constants.TERMINAL_HEIGHT - 2));
+        addPanel( new MainGamePanel(buffer, 1,1, Constants.TERMINAL_WIDTH - 2, Constants.TERMINAL_HEIGHT - 2));
     }
 }

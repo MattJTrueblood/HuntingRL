@@ -9,6 +9,7 @@ import huntingrl.ecs.ComponentMappers;
 import huntingrl.ecs.components.PlayerComponent;
 import huntingrl.ecs.components.PositionComponent;
 import huntingrl.ecs.components.ViewFrameComponent;
+import huntingrl.view.RenderBuffer;
 import huntingrl.view.SceneChangeEvent;
 import huntingrl.view.menu.QuitScene;
 
@@ -28,10 +29,10 @@ public class InputSystem extends EntitySystem {
     private Entity playerEntity;
     private ViewFrameComponent viewFrame;
 
-    private AsciiPanel terminal;
+    private RenderBuffer buffer;
 
-    public InputSystem(AsciiPanel terminal) {
-        this.terminal = terminal;
+    public InputSystem(RenderBuffer buffer) {
+        this.buffer = buffer;
     }
 
     public void addedToEngine(Engine engine) {
@@ -101,7 +102,7 @@ public class InputSystem extends EntitySystem {
 
     private SceneChangeEvent createQuitMenuSceneEvent() {
         return SceneChangeEvent.builder()
-                .scene(new QuitScene(terminal))
+                .scene(new QuitScene(buffer))
                 .saveOldScene(true)
                 .build();
     }

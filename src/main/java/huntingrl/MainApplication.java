@@ -2,6 +2,7 @@ package huntingrl;
 
 import javax.swing.JFrame;
 import asciiPanel.AsciiPanel;
+import huntingrl.view.RenderBuffer;
 import huntingrl.view.SceneController;
 import huntingrl.view.menu.StartScene;
 import huntingrl.util.Constants;
@@ -12,6 +13,7 @@ import java.awt.event.KeyListener;
 public class MainApplication extends JFrame implements KeyListener {
 
   private AsciiPanel terminal;
+  private RenderBuffer buffer;
   private SceneController sceneController;
 
   private MainApplication() {
@@ -20,7 +22,9 @@ public class MainApplication extends JFrame implements KeyListener {
     this.add(terminal);
     this.pack();
 
-    this.sceneController = new SceneController(new StartScene(terminal));
+    this.buffer = new RenderBuffer(terminal);
+
+    this.sceneController = new SceneController(new StartScene(buffer));
     this.addKeyListener(this);
     this.drawScene();
   }

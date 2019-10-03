@@ -1,14 +1,15 @@
 package huntingrl.view.menu;
 
 import asciiPanel.AsciiPanel;
+import huntingrl.view.RenderBuffer;
 import huntingrl.view.SceneChangeEvent;
 
 import java.util.ArrayList;
 
 public class QuitScene extends MenuScene {
 
-    public QuitScene(AsciiPanel terminal) {
-        super(terminal);
+    public QuitScene(RenderBuffer buffer) {
+        super(buffer);
     }
 
     @Override

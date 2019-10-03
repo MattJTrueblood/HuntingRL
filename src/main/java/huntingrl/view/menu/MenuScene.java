@@ -1,6 +1,7 @@
 package huntingrl.view.menu;
 
 import asciiPanel.AsciiPanel;
+import huntingrl.view.RenderBuffer;
 import huntingrl.view.Scene;
 import huntingrl.view.SceneChangeEvent;
 import huntingrl.util.Constants;
@@ -20,12 +21,12 @@ public abstract class MenuScene implements Scene {
     private static final int NAVIGATE_DOWN_KEYCODE = KeyEvent.VK_DOWN;
     private static final int SELECT_ITEM_KEYCODE = KeyEvent.VK_ENTER;
 
-    private AsciiPanel terminal;
+    private RenderBuffer buffer;
     private List<MenuItem> menuItems;
     private int currentSelectedIndex;
 
-    public MenuScene(AsciiPanel terminal) {
-        this.terminal = terminal;
+    public MenuScene(RenderBuffer buffer) {
+        this.buffer = buffer;
     }
 
     @Override
@@ -64,6 +65,7 @@ public abstract class MenuScene implements Scene {
 
     @Override
     public void draw() {
+        this.buffer.clearBuffer();
         for(int i = 0; i < menuItems.size(); i++) {
             MenuItem itemToWrite = menuItems.get(i);
             Color textFgColor = Color.WHITE;
@@ -72,7 +74,7 @@ public abstract class MenuScene implements Scene {
                 textFgColor = Color.BLACK;
                 textBgColor = Color.WHITE;
             }
-            this.terminal.writeCenter(itemToWrite.getText(),
+            this.buffer.getTerminal().writeCenter(itemToWrite.getText(),
                     Constants.TERMINAL_HEIGHT / 2 + (i - (menuItems.size() / 2)),
                     textFgColor, textBgColor);
         }
