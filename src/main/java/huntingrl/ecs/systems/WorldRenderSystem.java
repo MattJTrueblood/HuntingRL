@@ -1,6 +1,5 @@
 package huntingrl.ecs.systems;
 
-import asciiPanel.AsciiPanel;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
