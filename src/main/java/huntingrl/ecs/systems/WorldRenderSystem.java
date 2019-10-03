@@ -30,24 +30,18 @@ public class WorldRenderSystem extends EntitySystem {
     public void update(float deltaTime) {
         for(int i = 0; i < viewFrameComponent.getPanelBounds().getWidth(); i++) {
             for (int j = 0; j < viewFrameComponent.getPanelBounds().getHeight(); j++) {
-                //out of world bounds check
-                if(worldComponent.getWorld().pointOutOfBounds(i + viewFrameComponent.getOffsetX(), j + viewFrameComponent.getOffsetY())) {
-                    terminal.write((char) 0, viewFrameComponent.getPanelBounds().getX() + i,
-                            viewFrameComponent.getPanelBounds().getY() + j, Color.BLACK, Color.BLACK);
-                } else {
-                    //render world tile
-                    WorldPoint pointAtIJ = worldComponent.getWorld()
-                            .pointAt((i + viewFrameComponent.getOffsetX()) / viewFrameComponent.getZoomLevel(),
-                                    (j + viewFrameComponent.getOffsetY()) / viewFrameComponent.getZoomLevel());
-                    int pointElevationFactor = pointAtIJ.getElevation();
-                    Color terrainColor = pointElevationFactor < 50
-                            ? new Color(0, 0, 255)
-                            : new Color(0, pointElevationFactor, 0);
+                //render world tile
+                WorldPoint pointAtIJ = worldComponent.getWorld()
+                        .pointAt(viewFrameComponent.getOffsetWorldX() + (viewFrameComponent.getTileSize() * i),
+                                viewFrameComponent.getOffsetWorldY() + (viewFrameComponent.getTileSize() * j));
+                int pointElevationFactor = pointAtIJ.getElevation();
+                Color terrainColor = pointElevationFactor < 50
+                        ? new Color(0, 0, 255)
+                        : new Color(0, pointElevationFactor, 0);
 
-                    terminal.write((char) 0, viewFrameComponent.getPanelBounds().getX() + i,
-                            viewFrameComponent.getPanelBounds().getY() + j,
-                            Color.GRAY, terrainColor);
-                }
+                terminal.write((char) 0, viewFrameComponent.getPanelBounds().getX() + i,
+                        viewFrameComponent.getPanelBounds().getY() + j,
+                        Color.GRAY, terrainColor);
             }
         }
     }
