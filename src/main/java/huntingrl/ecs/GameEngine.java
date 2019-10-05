@@ -2,7 +2,11 @@ package huntingrl.ecs;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import huntingrl.ecs.components.*;
+import huntingrl.ecs.components.GraphicsComponent;
+import huntingrl.ecs.components.PlayerComponent;
+import huntingrl.ecs.components.PositionComponent;
+import huntingrl.ecs.components.WorldComponent;
+import huntingrl.ecs.systems.FrameSystem;
 import huntingrl.ecs.systems.InputSystem;
 import huntingrl.ecs.systems.RenderSystem;
 import huntingrl.view.RenderBuffer;
@@ -12,6 +16,7 @@ import huntingrl.world.World;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class GameEngine {
@@ -24,6 +29,7 @@ public class GameEngine {
         addPlayer();
         gameEngine.addSystem(new RenderSystem(buffer));
         gameEngine.addSystem(new InputSystem(buffer));
+        gameEngine.addSystem(new FrameSystem());
     }
 
     private void addWorld() {
@@ -43,12 +49,13 @@ public class GameEngine {
         gameEngine.addEntity(player);
     }
 
-    public SceneChangeEvent receiveInput(InputEvent inputEvent, ViewFrame frame, boolean inputEnabled) {
-        return gameEngine.getSystem(InputSystem.class).receiveInput(inputEvent, frame, inputEnabled);
+    public SceneChangeEvent receiveInput(InputEvent inputEvent) {
+        return gameEngine.getSystem(InputSystem.class).receiveInput(inputEvent);
     }
 
     public void renderInView(ViewFrame viewFrame) {
         //Engine update will call the RenderSystem to render the world
+        gameEngine.getSystem(FrameSystem.class).updateViewFrameOffset(viewFrame);
         RenderSystem renderSystem = gameEngine.getSystem(RenderSystem.class);
         renderSystem.renderInView(viewFrame);
     }
