@@ -12,11 +12,12 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+import javax.swing.text.View;
 import java.util.*;
 
 public class WorldChunkingSystem extends EntitySystem {
 
-    private static final int CHUNK_SIZE_IN_TILES = 8;
+    private static final int CHUNK_SIZE_IN_TILES = 16;
     private static final int TIME_TO_UNLOADED_CHUNK_DESPAWN = 100;
 
     private Map<ViewFrame, Map<ChunkCoords, Chunk>> chunkMap = new HashMap<>();
@@ -33,54 +34,69 @@ public class WorldChunkingSystem extends EntitySystem {
             chunkMap.put(frame, new HashMap<>());
         }
         Map<ChunkCoords, Chunk> chunksForThisViewFrame = chunkMap.get(frame);
-
-        WorldPoint[][] worldPointsInFrame = new WorldPoint[frame.getPanelBounds().getWidth()][frame.getPanelBounds().getHeight()];
         int chunkSizeInWorldCoords = CHUNK_SIZE_IN_TILES * frame.getTileSize();
 
+        WorldPoint[][] worldPointsInFrame = new WorldPoint[frame.getPanelBounds().getWidth()][frame.getPanelBounds().getHeight()];
         for(int i = 0; i < frame.getPanelBounds().getWidth(); i++) {
             for(int j = 0; j < frame.getPanelBounds().getHeight(); j++) {
-
-                //convert ij to chunk coords.
-                long worldX = frame.getOffsetWorldX() + (i * frame.getTileSize());
-                long worldY = frame.getOffsetWorldY() + (j * frame.getTileSize());
-                ChunkCoords ijChunkCoords = new ChunkCoords(
-                        roundWorldCoordToNearestChunk(worldX, chunkSizeInWorldCoords),
-                        roundWorldCoordToNearestChunk(worldY, chunkSizeInWorldCoords));
-
-                //check chunk coords in chunk map.  retrieve chunk if in map, otherwise generate new chunk using world
-                Chunk chunkForIJ;
-                if(!chunksForThisViewFrame.containsKey(ijChunkCoords)) {
-                    System.out.println("GENERATING UNLOADED CHUNK AT " + ijChunkCoords.worldX + ", " + ijChunkCoords.worldY +
-                            ", TILESIZE=" + frame.getTileSize());
-                    chunkForIJ = new Chunk(ijChunkCoords, world, frame.getTileSize());
-                    chunksForThisViewFrame.put(ijChunkCoords, chunkForIJ);
-                } else {
-                    System.out.println("we already have a chunk at " + ijChunkCoords.worldX + ", " + ijChunkCoords.worldY +
-                            ", tilesize=" + frame.getTileSize());
-                   chunkForIJ = chunksForThisViewFrame.get(ijChunkCoords);
-                }
-
-                //get ij point from chunk, store in worldPointsInFrame
-                int xIndexInsideChunk = ((int) (worldX - ijChunkCoords.worldX)) / frame.getTileSize();
-                int yIndexInsideChunk = ((int) (worldY - ijChunkCoords.worldY)) / frame.getTileSize();
-                worldPointsInFrame[i][j] = chunkForIJ.getPoints()[xIndexInsideChunk][yIndexInsideChunk];
+                ChunkCoords ijChunkCoords = getChunkCoordsForIJInViewFrame(i, j, frame, chunkSizeInWorldCoords);
+                Chunk chunkForIJ = findOrGenerateChunk(chunksForThisViewFrame, ijChunkCoords, frame);
+                worldPointsInFrame[i][j] = getWorldPointInChunkFromWorldCoords(
+                        frame.getOffsetWorldX() + (i * frame.getTileSize()),
+                        frame.getOffsetWorldY() + (j * frame.getTileSize()),
+                        chunkForIJ, frame);
             }
         }
 
-        //decrement all chunk despawn counters, despawn any chunks that haven't been loaded recently
-        for(Map.Entry<ChunkCoords, Chunk> chunkEntry : chunksForThisViewFrame.entrySet()) {
-            chunkEntry.getValue().decrementDespawnTime();
-            if(chunkEntry.getValue().shouldDespawn()) {
-                chunksForThisViewFrame.remove(chunkEntry.getKey());
-            }
-        }
+        unloadStaleChunks(chunksForThisViewFrame);
 
         return worldPointsInFrame;
     }
 
-    //this returns in world coords
+    private ChunkCoords getChunkCoordsForIJInViewFrame(int i, int j, ViewFrame frame, int chunkSizeInWorldCoords) {
+        long worldX = frame.getOffsetWorldX() + (i * frame.getTileSize());
+        long worldY = frame.getOffsetWorldY() + (j * frame.getTileSize());
+        return new ChunkCoords(
+                roundWorldCoordToNearestChunk(worldX, chunkSizeInWorldCoords),
+                roundWorldCoordToNearestChunk(worldY, chunkSizeInWorldCoords));
+    }
+
     private long roundWorldCoordToNearestChunk(long value, int chunkSize) {
-        return (value / chunkSize) * chunkSize;
+        return (long) Math.floor((double) value / chunkSize) * chunkSize;
+    }
+
+    private Chunk findOrGenerateChunk(Map<ChunkCoords, Chunk> chunksForThisViewFrame, ChunkCoords chunkCoords, ViewFrame frame) {
+        Chunk chunkForIJ;
+        if(!chunksForThisViewFrame.containsKey(chunkCoords)) {
+            //System.out.println("GENERATING UNLOADED CHUNK AT " + chunkCoords.worldX + ", " + chunkCoords.worldY +
+            //        ", TILESIZE=" + frame.getTileSize());
+            chunkForIJ = new Chunk(chunkCoords, world, frame.getTileSize());
+            chunksForThisViewFrame.put(chunkCoords, chunkForIJ);
+        } else {
+            //System.out.println("we already have a chunk at " + chunkCoords.worldX + ", " + chunkCoords.worldY +
+            //        ", tilesize=" + frame.getTileSize());
+            chunkForIJ = chunksForThisViewFrame.get(chunkCoords);
+        }
+        return chunkForIJ;
+    }
+
+    private WorldPoint  getWorldPointInChunkFromWorldCoords(long worldX, long worldY, Chunk chunk, ViewFrame frame) {
+        int xIndexInsideChunk = ((int) (worldX - chunk.getCoords().worldX)) / frame.getTileSize();
+        int yIndexInsideChunk = ((int) (worldY - chunk.getCoords().worldY)) / frame.getTileSize();
+        return chunk.getPoints()[xIndexInsideChunk][yIndexInsideChunk];
+    }
+
+    private void unloadStaleChunks(Map<ChunkCoords, Chunk> chunkMap) {
+        List<ChunkCoords> keysToRemove = new ArrayList<>();
+        for(Map.Entry<ChunkCoords, Chunk> chunkEntry : chunkMap.entrySet()) {
+            chunkEntry.getValue().decrementDespawnTime();
+            if(chunkEntry.getValue().shouldDespawn()) {
+                keysToRemove.add(chunkEntry.getKey());
+            }
+        }
+        for(ChunkCoords keyToRemove : keysToRemove) {
+            chunkMap.remove(keyToRemove);
+        }
     }
 
     @Getter
@@ -121,6 +137,7 @@ public class WorldChunkingSystem extends EntitySystem {
 
     @AllArgsConstructor
     @Getter
+    @EqualsAndHashCode
     private class ChunkCoords {
         private long worldX;
         private long worldY;
