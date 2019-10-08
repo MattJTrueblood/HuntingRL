@@ -9,6 +9,7 @@ import huntingrl.ecs.components.WorldComponent;
 import huntingrl.ecs.systems.FrameSystem;
 import huntingrl.ecs.systems.InputSystem;
 import huntingrl.ecs.systems.RenderSystem;
+import huntingrl.ecs.systems.WorldChunkingSystem;
 import huntingrl.view.RenderBuffer;
 import huntingrl.view.SceneChangeEvent;
 import huntingrl.view.panel.ViewFrame;
@@ -27,6 +28,7 @@ public class GameEngine {
         gameEngine = new Engine();
         addWorld();
         addPlayer();
+        gameEngine.addSystem(new WorldChunkingSystem());
         gameEngine.addSystem(new RenderSystem(buffer));
         gameEngine.addSystem(new InputSystem(buffer));
         gameEngine.addSystem(new FrameSystem());

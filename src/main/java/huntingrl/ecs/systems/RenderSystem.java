@@ -11,11 +11,13 @@ import huntingrl.view.panel.ViewFrame;
 import huntingrl.world.WorldPoint;
 
 import java.awt.*;
+import java.util.List;
 
 public class RenderSystem extends EntitySystem {
 
     private ImmutableArray<Entity> renderableEntities;
     private WorldComponent worldComponent;
+    private WorldChunkingSystem worldChunkingSystem;
 
     private RenderBuffer buffer;
 
@@ -28,6 +30,7 @@ public class RenderSystem extends EntitySystem {
         super.addedToEngine(engine);
         renderableEntities = engine.getEntitiesFor(Family.all(PositionComponent.class, GraphicsComponent.class).get());
         worldComponent = engine.getEntitiesFor(Family.all(WorldComponent.class).get()).first().getComponent(WorldComponent.class);
+        worldChunkingSystem = engine.getSystem(WorldChunkingSystem.class);
     }
 
     public void renderInView(ViewFrame viewFrame) {
@@ -36,13 +39,10 @@ public class RenderSystem extends EntitySystem {
     }
     
     private void renderWorldInView(ViewFrame viewFrame) {
+        WorldPoint[][] worldPointsInFrame = worldChunkingSystem.retrieveWorldPointsInFrame(viewFrame);
         for(int i = 0; i < viewFrame.getPanelBounds().getWidth(); i++) {
-            for (int j = 0; j < viewFrame.getPanelBounds().getHeight(); j++) {
-                //render world tile
-                WorldPoint pointAtIJ = worldComponent.getWorld()
-                        .pointAt(viewFrame.getOffsetWorldX() + (viewFrame.getTileSize() * i),
-                                viewFrame.getOffsetWorldY() + (viewFrame.getTileSize() * j));
-                int pointElevationFactor = pointAtIJ.getElevation();
+            for(int j = 0; j < viewFrame.getPanelBounds().getHeight(); j++) {
+                int pointElevationFactor = worldPointsInFrame[i][j].getElevation();
                 Color terrainColor = pointElevationFactor < 50
                         ? new Color(0, 0, 255)
                         : new Color(0, pointElevationFactor, 0);

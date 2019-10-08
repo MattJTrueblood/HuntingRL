@@ -50,7 +50,7 @@ public class RenderBuffer {
     }
 
     /**
-     * Try not to use this too much unless you're doing a simple scene and need weird special functions from AsciiPanel.
+     * Use this if you need access to something other than the write(char, x, y, fg, bg) function.
      * @return
      */
     public AsciiPanel getTerminal() {
@@ -79,7 +79,7 @@ public class RenderBuffer {
 
         public void applyColor(Color newBgColor, Color newFgColor) {
             bgColor = combineColors(bgColor, newBgColor);
-            fgColor = combineColors(bgColor, newFgColor); //experimental
+            fgColor = combineColors(bgColor, newFgColor);
         }
 
         private Color combineColors(Color bottomColor, Color topColor) {

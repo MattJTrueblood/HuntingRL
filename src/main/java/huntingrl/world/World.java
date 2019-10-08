@@ -25,7 +25,7 @@ public class World {
     }
 
     public WorldPoint pointAt(double x, double y) {
-        return new WorldPoint((short)elevationAtCoords(x, y));
+        return new WorldPoint(x, y, (short)elevationAtCoords(x, y));
     }
 
     private double elevationAtCoords(double x, double y){

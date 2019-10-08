@@ -26,14 +26,8 @@ public class GameScene extends MultiPanelScene {
                 engine, 1, false));
     }
 
-    /**
-     * Normally, each panel receives input.  Howevever, with multiple
-     * @param event
-     * @return
-     */
     @Override
     public SceneChangeEvent receiveInput(InputEvent event) {
         return engine.receiveInput(event);
-
     }
 }
