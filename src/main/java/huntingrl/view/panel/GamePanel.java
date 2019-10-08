@@ -14,7 +14,7 @@ public class GamePanel extends DrawPanel {
     private final boolean inputEnabled;
     private final ViewFrame viewFrame;
 
-    public GamePanel(RenderBuffer buffer, int x, int y, int width, int height, GameEngine engine, double tileSize, boolean inputEnabled) {
+    public GamePanel(RenderBuffer buffer, int x, int y, int width, int height, GameEngine engine, short tileSize, boolean inputEnabled) {
         super(buffer, x, y, width, height, 0);
         setBaseColor(Color.BLACK);
         this.viewFrame = new ViewFrame(this.getBounds(), 0, 0, tileSize);

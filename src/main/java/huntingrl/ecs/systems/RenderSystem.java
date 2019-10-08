@@ -11,7 +11,6 @@ import huntingrl.view.panel.ViewFrame;
 import huntingrl.world.WorldPoint;
 
 import java.awt.*;
-import java.util.List;
 
 public class RenderSystem extends EntitySystem {
 

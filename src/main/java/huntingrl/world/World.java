@@ -24,11 +24,11 @@ public class World {
         treeSeed = elevationSeed + 1;
     }
 
-    public WorldPoint pointAt(double x, double y) {
+    public WorldPoint pointAt(long x, long y) {
         return new WorldPoint(x, y, (short)elevationAtCoords(x, y));
     }
 
-    private double elevationAtCoords(double x, double y){
+    private double elevationAtCoords(long x, long y){
         double elevationAtPoint = 0;
         for(int i = 0; i < NOISE_FREQUENCIES.length; i++) {
             elevationAtPoint += NOISE_AMPLITUDES[i] * Noise.gradientCoherentNoise3D(

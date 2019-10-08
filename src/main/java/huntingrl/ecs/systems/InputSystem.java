@@ -22,7 +22,7 @@ public class InputSystem extends EntitySystem {
     private static final int RIGHT_KEYCODE = KeyEvent.VK_RIGHT;
     private static final int QUIT_KEYCODE = KeyEvent.VK_ESCAPE;
 
-    private static final double PLAYER_MOVEMENT_DISTANCE = 1;
+    private static final short PLAYER_MOVEMENT_DISTANCE = 1;
 
     private Entity playerEntity;
 

@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 public class ViewFrame {
     PanelBounds panelBounds;
-    double offsetWorldX;
-    double offsetWorldY;
-    double tileSize; //length/height of tile in world coords.  Increase this to zoom out, decrease to zoom in.
+    long offsetWorldX;
+    long offsetWorldY;
+    short tileSize; //length/height of tile in world coords.  Increase this to zoom out, decrease to zoom in.
 }

@@ -12,6 +12,6 @@ import lombok.Setter;
 @Setter
 public class PositionComponent implements Component {
     //x and y are in world coords
-    private double x;
-    private double y;
+    private long x;
+    private long y;
 }

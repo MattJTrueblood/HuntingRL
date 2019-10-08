@@ -29,7 +29,7 @@ public class FrameSystem extends EntitySystem {
         centerViewFrameOnLocation(viewFrame, positionComponent.getX(), positionComponent.getY());
     }
 
-    private void centerViewFrameOnLocation(ViewFrame viewFrame, double playerX, double playerY) {
+    private void centerViewFrameOnLocation(ViewFrame viewFrame, long playerX, long playerY) {
         viewFrame.setOffsetWorldX(playerX - ((viewFrame.getPanelBounds().getWidth() * viewFrame.getTileSize()) / 2));
         viewFrame.setOffsetWorldY(playerY - ((viewFrame.getPanelBounds().getHeight() * viewFrame.getTileSize()) / 2));
     }

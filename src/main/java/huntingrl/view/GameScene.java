@@ -19,11 +19,11 @@ public class GameScene extends MultiPanelScene {
         //zoomed out panel
         addPanel( new GamePanel(buffer, 1,1,
                 (Constants.TERMINAL_WIDTH / 2) - 1, Constants.TERMINAL_HEIGHT - 2,
-                engine, 32,false));
+                engine, (short) 32,false));
         //zoomed in panel
         addPanel( new GamePanel(buffer, (Constants.TERMINAL_WIDTH / 2) + 1,1,
                 (Constants.TERMINAL_WIDTH / 2) - 2, Constants.TERMINAL_HEIGHT - 2,
-                engine, 1, false));
+                engine, (short) 1, false));
     }
 
     @Override
