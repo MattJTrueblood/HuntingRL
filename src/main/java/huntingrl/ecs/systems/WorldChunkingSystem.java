@@ -29,7 +29,6 @@ public class WorldChunkingSystem extends EntitySystem {
     }
 
     public WorldPoint[][] retrieveWorldPointsInFrame(ViewFrame frame) {
-        //create chunk map if you haven't used this viewframe before.
         if(!chunkMap.containsKey(frame)) {
             chunkMap.put(frame, new HashMap<>());
         }
@@ -68,13 +67,9 @@ public class WorldChunkingSystem extends EntitySystem {
     private Chunk findOrGenerateChunk(Map<ChunkCoords, Chunk> chunksForThisViewFrame, ChunkCoords chunkCoords, ViewFrame frame) {
         Chunk chunkForIJ;
         if(!chunksForThisViewFrame.containsKey(chunkCoords)) {
-            //System.out.println("GENERATING UNLOADED CHUNK AT " + chunkCoords.worldX + ", " + chunkCoords.worldY +
-            //        ", TILESIZE=" + frame.getTileSize());
             chunkForIJ = new Chunk(chunkCoords, world, frame.getTileSize());
             chunksForThisViewFrame.put(chunkCoords, chunkForIJ);
         } else {
-            //System.out.println("we already have a chunk at " + chunkCoords.worldX + ", " + chunkCoords.worldY +
-            //        ", tilesize=" + frame.getTileSize());
             chunkForIJ = chunksForThisViewFrame.get(chunkCoords);
         }
         return chunkForIJ;

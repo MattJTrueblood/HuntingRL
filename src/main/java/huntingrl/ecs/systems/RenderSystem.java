@@ -15,7 +15,6 @@ import java.awt.*;
 public class RenderSystem extends EntitySystem {
 
     private ImmutableArray<Entity> renderableEntities;
-    private WorldComponent worldComponent;
     private WorldChunkingSystem worldChunkingSystem;
 
     private RenderBuffer buffer;
@@ -28,7 +27,6 @@ public class RenderSystem extends EntitySystem {
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
         renderableEntities = engine.getEntitiesFor(Family.all(PositionComponent.class, GraphicsComponent.class).get());
-        worldComponent = engine.getEntitiesFor(Family.all(WorldComponent.class).get()).first().getComponent(WorldComponent.class);
         worldChunkingSystem = engine.getSystem(WorldChunkingSystem.class);
     }
 

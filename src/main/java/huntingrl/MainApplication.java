@@ -64,7 +64,6 @@ public class MainApplication extends JFrame implements KeyListener {
         MainApplication app = new MainApplication();
         app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         app.setVisible(true);
-
         app.start();
     }
 }
