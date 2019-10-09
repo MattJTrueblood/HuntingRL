@@ -2,10 +2,12 @@ package huntingrl.world;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 @AllArgsConstructor
 @Getter
-public class WorldPoint {
-    WorldCoord coords;
-    private short elevation;
+@Setter
+public class WorldCoord {
+    long x;
+    long y;
 }

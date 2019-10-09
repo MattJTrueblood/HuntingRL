@@ -20,7 +20,7 @@ public class WorldChunkingSystem extends EntitySystem {
     private static final int CHUNK_SIZE_IN_TILES = 16;
     private static final int TIME_TO_UNLOADED_CHUNK_DESPAWN = 100;
 
-    private Map<ViewFrame, Map<ChunkCoords, Chunk>> chunkMap = new HashMap<>();
+    private Map<ViewFrame, Map<ChunkCoords, Chunk>> chunkMapsForFrames = new HashMap<>();
 
     private World world;
 
@@ -29,26 +29,32 @@ public class WorldChunkingSystem extends EntitySystem {
     }
 
     public WorldPoint[][] retrieveWorldPointsInFrame(ViewFrame frame) {
-        if(!chunkMap.containsKey(frame)) {
-            chunkMap.put(frame, new HashMap<>());
-        }
-        Map<ChunkCoords, Chunk> chunksForThisViewFrame = chunkMap.get(frame);
-        int chunkSizeInWorldCoords = CHUNK_SIZE_IN_TILES * frame.getTileSize();
+        Map<ChunkCoords, Chunk> chunkMap = getChunkMapForFrame(frame);
+        WorldPoint[][] worldPoints = loadWorldPointsInFrameFromMap(frame, chunkMap);
+        unloadStaleChunks(chunkMap);
+        return worldPoints;
+    }
 
+    private Map<ChunkCoords, Chunk> getChunkMapForFrame(ViewFrame frame) {
+        if(!chunkMapsForFrames.containsKey(frame)) {
+            chunkMapsForFrames.put(frame, new HashMap<>());
+        }
+        return chunkMapsForFrames.get(frame);
+    }
+
+    private WorldPoint[][] loadWorldPointsInFrameFromMap(ViewFrame frame, Map<ChunkCoords, Chunk> chunkMap) {
+        int chunkSizeInWorldCoords = CHUNK_SIZE_IN_TILES * frame.getTileSize();
         WorldPoint[][] worldPointsInFrame = new WorldPoint[frame.getPanelBounds().getWidth()][frame.getPanelBounds().getHeight()];
         for(int i = 0; i < frame.getPanelBounds().getWidth(); i++) {
             for(int j = 0; j < frame.getPanelBounds().getHeight(); j++) {
                 ChunkCoords ijChunkCoords = getChunkCoordsForIJInViewFrame(i, j, frame, chunkSizeInWorldCoords);
-                Chunk chunkForIJ = findOrGenerateChunk(chunksForThisViewFrame, ijChunkCoords, frame);
+                Chunk chunkForIJ = findOrGenerateChunk(chunkMap, ijChunkCoords, frame);
                 worldPointsInFrame[i][j] = getWorldPointInChunkFromWorldCoords(
                         frame.getOffsetWorldX() + (i * frame.getTileSize()),
                         frame.getOffsetWorldY() + (j * frame.getTileSize()),
                         chunkForIJ, frame);
             }
         }
-
-        unloadStaleChunks(chunksForThisViewFrame);
-
         return worldPointsInFrame;
     }
 
