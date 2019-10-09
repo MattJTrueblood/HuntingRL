@@ -25,7 +25,7 @@ public class World {
     private static final double NOISE_REDISTRIBUTION_FACTOR = 2.0;
     private static final double MAX_ELEVATION = 255;
     private static final double WORLD_SCALE_MOD = 256;
-    private static final long TREE_AVERAGE_DISTANCE = 4;
+    private static final long TREE_MIN_DISTANCE = 4;
     private static final double TREE_NOISE_FREQUENCY = 0.5;
 
     public World(int seed) {
@@ -56,23 +56,21 @@ public class World {
 
     private List<Entity> treesInBounds(long minX, long minY, long maxX, long maxY) {
         List<Entity> trees = new ArrayList<>();
-        for(long xc = minX; xc < maxX; xc+=TREE_AVERAGE_DISTANCE) {
-            for(long yc = minY; yc < maxY; yc+=TREE_AVERAGE_DISTANCE) {
-                long bestX = xc;
-                long bestY = yc;
-                double bestXYVal = 0;
-                for(long xn = xc; xn < xc + TREE_AVERAGE_DISTANCE; xn++) {
-                    for(long yn = yc; yn < yc + TREE_AVERAGE_DISTANCE; yn++) {
-                        double e = treeNoiseValueAt(xn, yn);
-                        if(e > bestXYVal) {
-                            bestXYVal = e;
-                            bestX = xn;
-                            bestY = yn;
+        for(long xc = minX; xc < maxX; xc++) {
+            for(long yc = minY; yc < maxY; yc++) {
+                if (elevationAtCoords(xc, yc) > WATER_ELEVATION) {
+                    double bestVal = 0;
+                    for (long xn = xc - TREE_MIN_DISTANCE; xn < xc + TREE_MIN_DISTANCE; xn++) {
+                        for (long yn = yc - TREE_MIN_DISTANCE; yn < yc + TREE_MIN_DISTANCE; yn++) {
+                            double e = treeNoiseValueAt(xn, yn);
+                            if (e > bestVal) {
+                                bestVal = e;
+                            }
                         }
                     }
-                }
-                if(elevationAtCoords(bestX, bestY) > WATER_ELEVATION) {
-                    trees.add(generateTree(new WorldCoord(bestX, bestY)));
+                    if(treeNoiseValueAt(xc, yc) == bestVal) {
+                        trees.add(generateTree(new WorldCoord(xc, yc)));
+                    }
                 }
             }
         }
