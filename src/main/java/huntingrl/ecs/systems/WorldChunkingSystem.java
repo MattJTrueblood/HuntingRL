@@ -1,8 +1,11 @@
 package huntingrl.ecs.systems;
 
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
+import huntingrl.ecs.ComponentMappers;
+import huntingrl.ecs.components.PositionComponent;
 import huntingrl.ecs.components.WorldComponent;
 import huntingrl.view.panel.ViewFrame;
 import huntingrl.world.World;
@@ -14,6 +17,7 @@ import lombok.Getter;
 
 import javax.swing.text.View;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class WorldChunkingSystem extends EntitySystem {
 
@@ -23,15 +27,17 @@ public class WorldChunkingSystem extends EntitySystem {
     private Map<ViewFrame, Map<ChunkCoords, Chunk>> chunkMapsForFrames = new HashMap<>();
 
     private World world;
+    private Engine engine;
 
     public void addedToEngine(Engine engine) {
+        this.engine = engine;
         world = engine.getEntitiesFor(Family.all(WorldComponent.class).get()).first().getComponent(WorldComponent.class).getWorld();
     }
 
     public WorldPoint[][] retrieveWorldPointsInFrame(ViewFrame frame) {
         Map<ChunkCoords, Chunk> chunkMap = getChunkMapForFrame(frame);
         WorldPoint[][] worldPoints = loadWorldPointsInFrameFromMap(frame, chunkMap);
-        unloadStaleChunks(chunkMap);
+        unloadStaleChunks(chunkMap, frame);
         return worldPoints;
     }
 
@@ -74,6 +80,10 @@ public class WorldChunkingSystem extends EntitySystem {
         Chunk chunkForIJ;
         if(!chunksForThisViewFrame.containsKey(chunkCoords)) {
             chunkForIJ = new Chunk(chunkCoords, world, frame.getTileSize());
+            if(frame.isLocalFrame()) {
+                chunkForIJ.loadEntities(world);
+                loadAllEntitiesInChunk(chunkForIJ);
+            }
             chunksForThisViewFrame.put(chunkCoords, chunkForIJ);
         } else {
             chunkForIJ = chunksForThisViewFrame.get(chunkCoords);
@@ -87,11 +97,14 @@ public class WorldChunkingSystem extends EntitySystem {
         return chunk.getPoints()[xIndexInsideChunk][yIndexInsideChunk];
     }
 
-    private void unloadStaleChunks(Map<ChunkCoords, Chunk> chunkMap) {
+    private void unloadStaleChunks(Map<ChunkCoords, Chunk> chunkMap, ViewFrame frame) {
         List<ChunkCoords> keysToRemove = new ArrayList<>();
         for(Map.Entry<ChunkCoords, Chunk> chunkEntry : chunkMap.entrySet()) {
             chunkEntry.getValue().decrementDespawnTime();
             if(chunkEntry.getValue().shouldDespawn()) {
+                if(frame.isLocalFrame()) {
+                    unloadAllEntitiesInChunk(chunkEntry.getValue());
+                }
                 keysToRemove.add(chunkEntry.getKey());
             }
         }
@@ -100,11 +113,24 @@ public class WorldChunkingSystem extends EntitySystem {
         }
     }
 
+    private void loadAllEntitiesInChunk(Chunk chunk) {
+        chunk.getEntities().forEach((Entity entity) -> {
+            this.engine.addEntity(entity);
+        });
+    }
+
+    private void unloadAllEntitiesInChunk(Chunk chunk) {
+        chunk.getEntities().forEach((Entity entity) -> {
+            this.engine.removeEntity(entity);
+        });
+    }
+
     @Getter
     private class Chunk {
         short tileSize;
         ChunkCoords coords;
         private WorldPoint[][] points;
+        private List<Entity> entities;
         private int timeToDespawn;
 
         public Chunk(ChunkCoords coords, World world, short tileSize) {
@@ -118,9 +144,15 @@ public class WorldChunkingSystem extends EntitySystem {
             points = new WorldPoint[CHUNK_SIZE_IN_TILES][CHUNK_SIZE_IN_TILES];
             for(int i = 0; i < CHUNK_SIZE_IN_TILES; i++) {
                 for(int j = 0; j < CHUNK_SIZE_IN_TILES; j++) {
-                    points[i][j] = world.pointAt(coords.worldX + (i * tileSize), coords.worldY + (j * tileSize));
+                    points[i][j] = world.pointAt(coords.worldX + (i * tileSize), coords.worldY + (j * tileSize), tileSize);
                 }
             }
+        }
+
+        public void loadEntities(World world) {
+            entities = world.entitiesInBounds(coords.worldX, coords.worldY,
+                    coords.worldX + (tileSize * CHUNK_SIZE_IN_TILES),
+                    coords.worldY + (tileSize * CHUNK_SIZE_IN_TILES));
         }
 
         private void decrementDespawnTime() {

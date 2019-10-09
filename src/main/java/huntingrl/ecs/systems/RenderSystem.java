@@ -4,10 +4,12 @@ import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
 import huntingrl.ecs.ComponentMappers;
 import huntingrl.ecs.components.GraphicsComponent;
+import huntingrl.ecs.components.LocalOnlyComponent;
 import huntingrl.ecs.components.PositionComponent;
 import huntingrl.ecs.components.WorldComponent;
 import huntingrl.view.RenderBuffer;
 import huntingrl.view.panel.ViewFrame;
+import huntingrl.world.World;
 import huntingrl.world.WorldPoint;
 
 import java.awt.*;
@@ -40,7 +42,7 @@ public class RenderSystem extends EntitySystem {
         for(int i = 0; i < viewFrame.getPanelBounds().getWidth(); i++) {
             for(int j = 0; j < viewFrame.getPanelBounds().getHeight(); j++) {
                 int pointElevationFactor = worldPointsInFrame[i][j].getElevation();
-                Color terrainColor = pointElevationFactor < 50
+                Color terrainColor = pointElevationFactor < World.WATER_ELEVATION
                         ? new Color(0, 0, 255)
                         : new Color(0, pointElevationFactor, 0);
 
@@ -55,6 +57,10 @@ public class RenderSystem extends EntitySystem {
         for(Entity entity: renderableEntities) {
             PositionComponent position = ComponentMappers.positionMapper.get(entity);
             GraphicsComponent graphics = ComponentMappers.graphicsMapper.get(entity);
+
+            if(!viewFrame.isLocalFrame() && ComponentMappers.localOnlyMapper.get(entity) != null) {
+                continue;
+            }
 
             if (position.getX() >= viewFrame.getOffsetWorldX() &&
                     position.getY() >= viewFrame.getOffsetWorldY() &&
