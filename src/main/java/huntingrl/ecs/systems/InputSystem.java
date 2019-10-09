@@ -1,6 +1,5 @@
 package huntingrl.ecs.systems;
 
-import asciiPanel.AsciiPanel;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
@@ -8,7 +7,6 @@ import com.badlogic.ashley.core.Family;
 import huntingrl.ecs.ComponentMappers;
 import huntingrl.ecs.components.PlayerComponent;
 import huntingrl.ecs.components.PositionComponent;
-import huntingrl.ecs.components.ViewFrameComponent;
 import huntingrl.view.RenderBuffer;
 import huntingrl.view.SceneChangeEvent;
 import huntingrl.view.menu.QuitScene;
@@ -23,11 +21,10 @@ public class InputSystem extends EntitySystem {
     private static final int LEFT_KEYCODE = KeyEvent.VK_LEFT;
     private static final int RIGHT_KEYCODE = KeyEvent.VK_RIGHT;
     private static final int QUIT_KEYCODE = KeyEvent.VK_ESCAPE;
-    private static final int ZOOM_OUT_KEYCODE = KeyEvent.VK_1;
-    private static final int ZOOM_IN_KEYCODE = KeyEvent.VK_2;
+
+    private static final short PLAYER_MOVEMENT_DISTANCE = 1;
 
     private Entity playerEntity;
-    private ViewFrameComponent viewFrame;
 
     private RenderBuffer buffer;
 
@@ -37,8 +34,6 @@ public class InputSystem extends EntitySystem {
 
     public void addedToEngine(Engine engine) {
         playerEntity = engine.getEntitiesFor(Family.all(PlayerComponent.class, PositionComponent.class).get()).first();
-        viewFrame = engine.getEntitiesFor(Family.all(ViewFrameComponent.class).get()).first().getComponent(ViewFrameComponent.class);
-        centerViewFrameOnPlayer();
     }
 
     public SceneChangeEvent receiveInput(InputEvent event) {
@@ -65,12 +60,6 @@ public class InputSystem extends EntitySystem {
             case RIGHT_KEYCODE:
                 movePlayer(1, 0);
                 break;
-            case ZOOM_IN_KEYCODE:
-                applyZoom(0.5);
-                break;
-            case ZOOM_OUT_KEYCODE:
-                applyZoom(2.0);
-                break;
             case QUIT_KEYCODE:
                 return createQuitMenuSceneEvent();
         }
@@ -79,25 +68,8 @@ public class InputSystem extends EntitySystem {
 
     private void movePlayer(int dx, int dy) {
         PositionComponent positionComponent = ComponentMappers.positionMapper.get(playerEntity);
-        positionComponent.setX(positionComponent.getX() + (dx * viewFrame.getTileSize()));
-        positionComponent.setY(positionComponent.getY() + (dy * viewFrame.getTileSize()));
-        centerViewFrameOnLocation(positionComponent.getX(), positionComponent.getY());
-    }
-
-    private void centerViewFrameOnLocation(double playerX, double playerY) {
-        viewFrame.setOffsetWorldX(playerX - ((viewFrame.getPanelBounds().getWidth() * viewFrame.getTileSize()) / 2));
-        viewFrame.setOffsetWorldY(playerY - ((viewFrame.getPanelBounds().getHeight() * viewFrame.getTileSize()) / 2));
-    }
-
-    private void applyZoom(double zoomModifier) {
-        viewFrame.setTileSize(viewFrame.getTileSize() * zoomModifier);
-        System.out.println(viewFrame.getTileSize());
-        centerViewFrameOnPlayer();
-    }
-
-    private void centerViewFrameOnPlayer() {
-        PositionComponent positionComponent = ComponentMappers.positionMapper.get(playerEntity);
-        centerViewFrameOnLocation(positionComponent.getX(), positionComponent.getY());
+        positionComponent.setX(positionComponent.getX() + (dx * PLAYER_MOVEMENT_DISTANCE));
+        positionComponent.setY(positionComponent.getY() + (dy * PLAYER_MOVEMENT_DISTANCE));
     }
 
     private SceneChangeEvent createQuitMenuSceneEvent() {

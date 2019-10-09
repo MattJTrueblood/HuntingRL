@@ -1,47 +1,43 @@
 package huntingrl.ecs;
 
-import asciiPanel.AsciiPanel;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import huntingrl.ecs.components.*;
+import huntingrl.ecs.components.GraphicsComponent;
+import huntingrl.ecs.components.PlayerComponent;
+import huntingrl.ecs.components.PositionComponent;
+import huntingrl.ecs.components.WorldComponent;
+import huntingrl.ecs.systems.FrameSystem;
 import huntingrl.ecs.systems.InputSystem;
 import huntingrl.ecs.systems.RenderSystem;
-import huntingrl.ecs.systems.WorldRenderSystem;
+import huntingrl.ecs.systems.WorldChunkingSystem;
 import huntingrl.view.RenderBuffer;
 import huntingrl.view.SceneChangeEvent;
-import huntingrl.view.panel.PanelBounds;
+import huntingrl.view.panel.ViewFrame;
 import huntingrl.world.World;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class GameEngine {
 
     private Engine gameEngine;
-    private PanelBounds bounds;
 
-    public GameEngine(RenderBuffer buffer, PanelBounds bounds) {
-        this.bounds = bounds;
+    public GameEngine(RenderBuffer buffer) {
         gameEngine = new Engine();
-        addViewFrame();
         addWorld();
         addPlayer();
-        gameEngine.addSystem(new WorldRenderSystem(100, buffer));
-        gameEngine.addSystem(new RenderSystem(101, buffer));
+        gameEngine.addSystem(new WorldChunkingSystem());
+        gameEngine.addSystem(new RenderSystem(buffer));
         gameEngine.addSystem(new InputSystem(buffer));
+        gameEngine.addSystem(new FrameSystem());
     }
 
     private void addWorld() {
         Entity world = new Entity();
         world.add(new WorldComponent(new World(ThreadLocalRandom.current().nextInt())));
         gameEngine.addEntity(world);
-    }
-
-    private void addViewFrame() {
-        Entity viewFrame = new Entity();
-        viewFrame.add(new ViewFrameComponent(bounds, 0, 0, 32));
-        gameEngine.addEntity(viewFrame);
     }
 
     private void addPlayer() {
@@ -59,8 +55,14 @@ public class GameEngine {
         return gameEngine.getSystem(InputSystem.class).receiveInput(inputEvent);
     }
 
-    public void render() {
+    public void renderInView(ViewFrame viewFrame) {
         //Engine update will call the RenderSystem to render the world
-        this.gameEngine.update(1);
+        gameEngine.getSystem(FrameSystem.class).updateViewFrameOffset(viewFrame);
+        RenderSystem renderSystem = gameEngine.getSystem(RenderSystem.class);
+        renderSystem.renderInView(viewFrame);
+    }
+
+    public void update(float deltaTime) {
+        gameEngine.update(deltaTime);
     }
 }
