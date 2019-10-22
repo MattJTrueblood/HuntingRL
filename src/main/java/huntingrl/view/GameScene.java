@@ -4,6 +4,7 @@ import com.flowpowered.noise.module.source.Const;
 import huntingrl.ecs.GameEngine;
 import huntingrl.view.panel.GamePanel;
 import huntingrl.util.Constants;
+import huntingrl.view.panel.ViewFrameProperties;
 
 import java.awt.event.InputEvent;
 
@@ -20,15 +21,15 @@ public class GameScene extends MultiPanelScene {
         //zoomed out panel 1
         addPanel( new GamePanel(buffer, 1,1,
                 (Constants.TERMINAL_WIDTH / 2) - 1, (Constants.TERMINAL_HEIGHT / 2) - 1,
-                engine, (short) 16, false, 40));
+                engine, new ViewFrameProperties((short) 16, false, 20, 20)));
         //zoomed out panel 2
         addPanel( new GamePanel(buffer, 1, (Constants.TERMINAL_HEIGHT / 2) + 1,
                 (Constants.TERMINAL_WIDTH / 2) - 1, (Constants.TERMINAL_HEIGHT / 2) - 2,
-                engine, (short) 64, false, 40));
+                engine, new ViewFrameProperties((short) 1, true, 5, 5)));
         //zoomed in panel
         addPanel( new GamePanel(buffer, (Constants.TERMINAL_WIDTH / 2) + 1,1,
                 (Constants.TERMINAL_WIDTH / 2) - 2, Constants.TERMINAL_HEIGHT - 2,
-                engine, (short) 1, true, 12));
+                engine, new ViewFrameProperties((short) 64, false, 40, 40)));
     }
 
     @Override

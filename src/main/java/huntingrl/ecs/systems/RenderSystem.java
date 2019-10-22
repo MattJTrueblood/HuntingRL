@@ -57,10 +57,10 @@ public class RenderSystem extends EntitySystem {
                     int deltaElevation = elevationAtIJ - playerElevation;
                     if (deltaElevation > 0) {
                         terrainColor = modifyColorByDeltaElevation(terrainColor, MAX_POSITIVE_DELTA_ELEVATION_COLOR,
-                                deltaElevation, viewFrame.getTerrainColorModSoftness());
+                                deltaElevation, viewFrame.getTerrainColorModPositiveSoftness());
                     } else if (deltaElevation < 0) {
                         terrainColor = modifyColorByDeltaElevation(terrainColor, MAX_NEGATIVE_DELTA_ELEVATION_COLOR,
-                                Math.abs(deltaElevation), viewFrame.getTerrainColorModSoftness());
+                                Math.abs(deltaElevation), viewFrame.getTerrainColorModNegativeSoftness());
                     }
                 }
 

@@ -21,9 +21,9 @@ public class World {
 
     public static final short WATER_ELEVATION = 50;
 
-    private static final double[] NOISE_FREQUENCIES = {0.5, 0.25, 0.125, 0.0625, 0.03125};
-    private static final double[] NOISE_AMPLITUDES = {0.5, 0.25, 0.125, 0.0625, 0.03125}; //try not to let the sum of these exceed 1.0
-    private static final double NOISE_REDISTRIBUTION_FACTOR = 2.0;
+    private static final double[] NOISE_FREQUENCIES = {0.15, 0.5, 1, 5, 10, 20, 50};
+    private static final double[] NOISE_AMPLITUDES = {0.65, 0.2, 0.05, 0.01, 0.005, 0.002, 0.001}; //try not to let the sum of these exceed 1.0
+    private static final double NOISE_REDISTRIBUTION_FACTOR = 2;
     private static final double MAX_ELEVATION = 255;
     private static final double WORLD_SCALE_MOD = 256;
     private static final long TREE_MIN_DISTANCE = 4;
@@ -45,10 +45,10 @@ public class World {
                     x * NOISE_FREQUENCIES[i] / WORLD_SCALE_MOD, y * NOISE_FREQUENCIES[i] / WORLD_SCALE_MOD,
                     0, elevationSeed, NoiseQuality.STANDARD);
         }
-        elevationAtPoint = Math.pow(elevationAtPoint, NOISE_REDISTRIBUTION_FACTOR);
+        elevationAtPoint = Math.pow(elevationAtPoint * 2, NOISE_REDISTRIBUTION_FACTOR) / Math.pow(2, NOISE_REDISTRIBUTION_FACTOR);
 
         //convert 0.0-1.0 elevation into world elevation
-        return elevationAtPoint * 255;
+        return elevationAtPoint * MAX_ELEVATION;
     }
 
     public List<Entity> entitiesInBounds(long minX, long minY, long maxX, long maxY) {

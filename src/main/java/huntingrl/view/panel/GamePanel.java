@@ -13,11 +13,10 @@ public class GamePanel extends DrawPanel {
     private final GameEngine mainGameEngine;
     private final ViewFrame viewFrame;
 
-    public GamePanel(RenderBuffer buffer, int x, int y, int width, int height, GameEngine engine, short tileSize,
-                     boolean localFrame, int terrainModSoftness) {
+    public GamePanel(RenderBuffer buffer, int x, int y, int width, int height, GameEngine engine, ViewFrameProperties properties) {
         super(buffer, x, y, width, height, 0);
         setBaseColor(Color.BLACK);
-        this.viewFrame = new ViewFrame(this.getBounds(), 0, 0, tileSize, localFrame, terrainModSoftness);
+        this.viewFrame = new ViewFrame(this.getBounds(), 0, 0, properties);
         mainGameEngine = engine;
     }
 
