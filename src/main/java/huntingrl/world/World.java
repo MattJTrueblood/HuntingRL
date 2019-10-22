@@ -3,6 +3,7 @@ package huntingrl.world;
 import com.badlogic.ashley.core.Entity;
 import com.flowpowered.noise.Noise;
 import com.flowpowered.noise.NoiseQuality;
+import huntingrl.ecs.components.BlocksMovementComponent;
 import huntingrl.ecs.components.GraphicsComponent;
 import huntingrl.ecs.components.LocalOnlyComponent;
 import huntingrl.ecs.components.PositionComponent;
@@ -88,6 +89,7 @@ public class World {
         entity.add(new PositionComponent(point.x, point.y));
         entity.add(new GraphicsComponent((char) 5, new Color(0, 10, 0), null));
         entity.add(new LocalOnlyComponent());
+        entity.add(new BlocksMovementComponent());
         return entity;
     }
 
