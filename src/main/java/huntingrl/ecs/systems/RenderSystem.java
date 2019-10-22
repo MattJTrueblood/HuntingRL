@@ -43,7 +43,7 @@ public class RenderSystem extends EntitySystem {
             for(int j = 0; j < viewFrame.getPanelBounds().getHeight(); j++) {
                 int pointElevationFactor = worldPointsInFrame[i][j].getElevation();
                 Color terrainColor = pointElevationFactor < World.WATER_ELEVATION
-                        ? new Color(0, 0, 255)
+                        ? new Color(0, 64, 200)
                         : new Color(0, pointElevationFactor, 0);
 
                 buffer.write((char) 0, viewFrame.getPanelBounds().getX() + i,
