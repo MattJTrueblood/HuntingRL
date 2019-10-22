@@ -3,10 +3,8 @@ package huntingrl.world;
 import com.badlogic.ashley.core.Entity;
 import com.flowpowered.noise.Noise;
 import com.flowpowered.noise.NoiseQuality;
-import huntingrl.ecs.components.BlocksMovementComponent;
-import huntingrl.ecs.components.GraphicsComponent;
-import huntingrl.ecs.components.LocalOnlyComponent;
-import huntingrl.ecs.components.PositionComponent;
+import huntingrl.ecs.components.*;
+import huntingrl.util.Math.Point;
 import lombok.Getter;
 
 import java.awt.*;
@@ -35,7 +33,7 @@ public class World {
     }
 
     public WorldPoint pointAt(long x, long y, short scale) {
-        return new WorldPoint(new WorldCoord(x + (scale / 2), y + (scale / 2)), (short)elevationAtCoords(x + (scale / 2), y + (scale / 2)));
+        return new WorldPoint(new Point(x + (scale / 2), y + (scale / 2)), (short)elevationAtCoords(x + (scale / 2), y + (scale / 2)));
     }
 
     private double elevationAtCoords(long x, long y){
@@ -70,7 +68,7 @@ public class World {
                         }
                     }
                     if(treeNoiseValueAt(xc, yc) == bestVal) {
-                        trees.add(generateTree(new WorldCoord(xc, yc)));
+                        trees.add(generateTree(new Point(xc, yc)));
                     }
                 }
             }
@@ -84,12 +82,13 @@ public class World {
                 0, treeSeed, NoiseQuality.STANDARD);
     }
 
-    private Entity generateTree(WorldCoord point) {
+    private Entity generateTree(Point point) {
         Entity entity = new Entity();
-        entity.add(new PositionComponent(point.x, point.y));
-        entity.add(new GraphicsComponent((char) 5, new Color(0, 10, 0), null));
+        entity.add(new PositionComponent(point.getX(), point.getY()));
+        entity.add(new GraphicsComponent((char) 79, new Color(70, 45, 0), null));
         entity.add(new LocalOnlyComponent());
         entity.add(new BlocksMovementComponent());
+        entity.add(new CastsShadowComponent());
         return entity;
     }
 

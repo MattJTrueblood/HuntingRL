@@ -4,12 +4,20 @@ import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
 import huntingrl.ecs.ComponentMappers;
 import huntingrl.ecs.components.*;
+import huntingrl.util.Math.MathUtils;
 import huntingrl.view.RenderBuffer;
 import huntingrl.view.panel.ViewFrame;
 import huntingrl.world.World;
 import huntingrl.world.WorldPoint;
+import huntingrl.util.Math.Point;
+import java.util.List;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 public class RenderSystem extends EntitySystem {
 
@@ -17,6 +25,7 @@ public class RenderSystem extends EntitySystem {
     private static final Color MAX_POSITIVE_DELTA_ELEVATION_COLOR = new Color(0, 0, 0);
 
     private ImmutableArray<Entity> renderableEntities;
+    private ImmutableArray<Entity> shadowingEntities;
     private Entity playerEntity;
     private WorldChunkingSystem worldChunkingSystem;
 
@@ -31,12 +40,16 @@ public class RenderSystem extends EntitySystem {
         super.addedToEngine(engine);
         playerEntity = engine.getEntitiesFor(Family.all(PlayerComponent.class, PositionComponent.class).get()).first();
         renderableEntities = engine.getEntitiesFor(Family.all(PositionComponent.class, GraphicsComponent.class).get());
+        shadowingEntities = engine.getEntitiesFor(Family.all(PositionComponent.class, CastsShadowComponent.class).get());
         worldChunkingSystem = engine.getSystem(WorldChunkingSystem.class);
     }
 
     public void renderInView(ViewFrame viewFrame) {
         renderWorldInView(viewFrame);
         renderEntitiesInView(viewFrame);
+        if(viewFrame.isLocalFrame()) {
+            applyFOVToRenderBuffer(viewFrame);
+        }
     }
     
     private void renderWorldInView(ViewFrame viewFrame) {
@@ -108,6 +121,70 @@ public class RenderSystem extends EntitySystem {
                 }
             }
         }
+    }
+
+    private void applyFOVToRenderBuffer(ViewFrame viewFrame) {
+        PositionComponent playerPosition = ComponentMappers.positionMapper.get(playerEntity);
+
+        List<Point> shadowedTiles = new ArrayList<>();
+        List<Point> edgeTiles = new ArrayList<>();
+        LongStream xRange1 = LongStream.range(viewFrame.getOffsetWorldX(), viewFrame.getOffsetWorldX() + viewFrame.getPanelBounds().getWidth());
+        LongStream xRange2 = LongStream.range(viewFrame.getOffsetWorldX(), viewFrame.getOffsetWorldX() + viewFrame.getPanelBounds().getWidth());
+        LongStream yRange1 = LongStream.range(viewFrame.getOffsetWorldY(), viewFrame.getOffsetWorldY() + viewFrame.getPanelBounds().getHeight());
+        LongStream yRange2 = LongStream.range(viewFrame.getOffsetWorldY(), viewFrame.getOffsetWorldY() + viewFrame.getPanelBounds().getHeight());
+
+        //collect all points on edge of view
+        edgeTiles.addAll(xRange1.mapToObj(x -> new Point(x, viewFrame.getOffsetWorldY())).collect(Collectors.toList()));
+        edgeTiles.addAll(xRange2.mapToObj(x -> new Point(x, viewFrame.getOffsetWorldY() + viewFrame.getPanelBounds().getHeight())).collect(Collectors.toList()));
+        edgeTiles.addAll(yRange1.mapToObj(y -> new Point(viewFrame.getOffsetWorldX(), y)).collect(Collectors.toList()));
+        edgeTiles.addAll(yRange2.mapToObj(y -> new Point(viewFrame.getOffsetWorldX() + viewFrame.getPanelBounds().getWidth(), y)).collect(Collectors.toList()));
+
+        edgeTiles.forEach(edgePoint -> {
+            Point[] lineFromPlayertoEdgePoint = MathUtils.bresenhamLine(
+                    new Point(playerPosition.getX(), playerPosition.getY()), edgePoint);
+            boolean castingShadow = false;
+            for(Point linePoint : lineFromPlayertoEdgePoint) {
+                if(castingShadow) {
+                    shadowedTiles.add(linePoint);
+                } else {
+                    for (Entity shadowingEntity : shadowingEntities) {
+                        PositionComponent shadowingPosition = ComponentMappers.positionMapper.get(shadowingEntity);
+                        if (shadowingPosition.getX() == linePoint.getX() && shadowingPosition.getY() == linePoint.getY()) {
+                            castingShadow = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+
+        List<Point> distinctShadowedTiles = shadowedTiles.stream().distinct().collect(Collectors.toList());
+        for(Point point: distinctShadowedTiles) {
+            if (point.getX() >= viewFrame.getOffsetWorldX() &&
+                    point.getY() >= viewFrame.getOffsetWorldY() &&
+                    point.getX() < viewFrame.getOffsetWorldX() + (viewFrame.getPanelBounds().getWidth() * viewFrame.getTileSize()) &&
+                    point.getY() < viewFrame.getOffsetWorldY() + (viewFrame.getPanelBounds().getHeight() * viewFrame.getTileSize())) {
+                buffer.write((char) 0,
+                        viewFrame.getPanelBounds().getX() + (int) ((point.getX() - viewFrame.getOffsetWorldX()) / viewFrame.getTileSize()),
+                        viewFrame.getPanelBounds().getY() + (int) ((point.getY() - viewFrame.getOffsetWorldY()) / viewFrame.getTileSize()),
+                        Color.RED, new Color(0, 0, 0, 255));
+            }
+        }
+
+        /*  LINE TEST
+
+        for(Point point : pointsFromPlayerToZeroZero) {
+            if (point.getX() >= viewFrame.getOffsetWorldX() &&
+                    point.getY() >= viewFrame.getOffsetWorldY() &&
+                    point.getX() < viewFrame.getOffsetWorldX() + (viewFrame.getPanelBounds().getWidth() * viewFrame.getTileSize()) &&
+                    point.getY() < viewFrame.getOffsetWorldY() + (viewFrame.getPanelBounds().getHeight() * viewFrame.getTileSize())) {
+                buffer.write((char) 37,
+                        viewFrame.getPanelBounds().getX() + (int) ((point.getX() - viewFrame.getOffsetWorldX()) / viewFrame.getTileSize()),
+                        viewFrame.getPanelBounds().getY() + (int) ((point.getY() - viewFrame.getOffsetWorldY()) / viewFrame.getTileSize()),
+                        Color.RED, new Color(0, 0, 0, 0));
+            }
+        }
+         */
     }
 }
 
