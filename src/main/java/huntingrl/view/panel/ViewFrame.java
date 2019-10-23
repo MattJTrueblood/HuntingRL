@@ -12,6 +12,21 @@ public class ViewFrame {
     PanelBounds panelBounds;
     long offsetWorldX;
     long offsetWorldY;
-    short tileSize; //length/height of tile in world coords.  Increase this to zoom out, decrease to zoom in.
-    boolean localFrame; //entities will only be loaded on chunks in a local frame.  Only 1 local frame at a time please!
+    ViewFrameProperties properties;
+
+    public short getTileSize() {
+        return properties.tileSize;
+    }
+
+    public boolean isLocalFrame() {
+        return properties.localFrame;
+    }
+
+    public int getTerrainColorModPositiveSoftness() {
+        return properties.terrainColorModPositiveSoftness;
+    }
+
+    public int getTerrainColorModNegativeSoftness() {
+        return properties.terrainColorModNegativeSoftness;
+    }
 }

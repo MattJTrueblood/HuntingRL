@@ -34,6 +34,12 @@ public class WorldChunkingSystem extends EntitySystem {
         world = engine.getEntitiesFor(Family.all(WorldComponent.class).get()).first().getComponent(WorldComponent.class).getWorld();
     }
 
+    /**
+     * The main function for loading the world in a view frame.  Each frame has a separate chunk map.  If you're adding
+     * and removing frames at all ADD A FUNCTION TO ALLOW YOU TO UNREGISTER FRAMES.  Otherwise, you're fine.
+     * @param frame
+     * @return
+     */
     public WorldPoint[][] retrieveWorldPointsInFrame(ViewFrame frame) {
         Map<ChunkCoords, Chunk> chunkMap = getChunkMapForFrame(frame);
         WorldPoint[][] worldPoints = loadWorldPointsInFrameFromMap(frame, chunkMap);
@@ -67,6 +73,10 @@ public class WorldChunkingSystem extends EntitySystem {
     private ChunkCoords getChunkCoordsForIJInViewFrame(int i, int j, ViewFrame frame, int chunkSizeInWorldCoords) {
         long worldX = frame.getOffsetWorldX() + (i * frame.getTileSize());
         long worldY = frame.getOffsetWorldY() + (j * frame.getTileSize());
+        return getChunkCoordsForChunkContainingWorldCoords(worldX, worldY, chunkSizeInWorldCoords);
+    }
+
+    private ChunkCoords getChunkCoordsForChunkContainingWorldCoords(long worldX, long worldY, int chunkSizeInWorldCoords) {
         return new ChunkCoords(
                 roundWorldCoordToNearestChunk(worldX, chunkSizeInWorldCoords),
                 roundWorldCoordToNearestChunk(worldY, chunkSizeInWorldCoords));
@@ -91,7 +101,7 @@ public class WorldChunkingSystem extends EntitySystem {
         return chunkForIJ;
     }
 
-    private WorldPoint  getWorldPointInChunkFromWorldCoords(long worldX, long worldY, Chunk chunk, ViewFrame frame) {
+    private WorldPoint getWorldPointInChunkFromWorldCoords(long worldX, long worldY, Chunk chunk, ViewFrame frame) {
         int xIndexInsideChunk = ((int) (worldX - chunk.getCoords().worldX)) / frame.getTileSize();
         int yIndexInsideChunk = ((int) (worldY - chunk.getCoords().worldY)) / frame.getTileSize();
         return chunk.getPoints()[xIndexInsideChunk][yIndexInsideChunk];
@@ -123,6 +133,21 @@ public class WorldChunkingSystem extends EntitySystem {
         chunk.getEntities().forEach((Entity entity) -> {
             this.engine.removeEntity(entity);
         });
+    }
+
+    /**
+     * Gets a single world point from world point x/y coords.  This is expensive, if you are getting multiple points from
+     * the same frame or chunk you can easily reuse those objects (see loadWorldPointsInFrameFromMap as an example)
+     * @param x
+     * @param y
+     * @param frame
+     * @return
+     */
+    public WorldPoint getWorldPointAt(long x, long y, ViewFrame frame) {
+        int chunkSizeInWorldCoords = CHUNK_SIZE_IN_TILES * frame.getTileSize();
+        ChunkCoords ijChunkCoords = getChunkCoordsForChunkContainingWorldCoords(x, y, chunkSizeInWorldCoords);
+        Chunk chunk = findOrGenerateChunk(chunkMapsForFrames.get(frame), ijChunkCoords, frame);
+        return getWorldPointInChunkFromWorldCoords(x, y, chunk, frame);
     }
 
     @Getter

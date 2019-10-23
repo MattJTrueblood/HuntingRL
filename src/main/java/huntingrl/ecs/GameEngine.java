@@ -36,7 +36,7 @@ public class GameEngine {
 
     private void addWorld() {
         Entity world = new Entity();
-        world.add(new WorldComponent(new World(ThreadLocalRandom.current().nextInt())));
+        world.add(new WorldComponent(new World()));
         gameEngine.addEntity(world);
     }
 
@@ -47,7 +47,7 @@ public class GameEngine {
                 .fgColor(new Color(255, 255, 0, 255))
                 .build());
         player.add(new PlayerComponent());
-        player.add(PositionComponent.builder().x(50).y(50).build());
+        player.add(PositionComponent.builder().x(0).y(0).build());
         gameEngine.addEntity(player);
     }
 

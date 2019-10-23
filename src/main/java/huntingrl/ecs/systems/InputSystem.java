@@ -4,12 +4,16 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.utils.ImmutableArray;
 import huntingrl.ecs.ComponentMappers;
+import huntingrl.ecs.components.BlocksMovementComponent;
+import huntingrl.ecs.components.LocalOnlyComponent;
 import huntingrl.ecs.components.PlayerComponent;
 import huntingrl.ecs.components.PositionComponent;
 import huntingrl.view.RenderBuffer;
 import huntingrl.view.SceneChangeEvent;
 import huntingrl.view.menu.QuitScene;
+import javafx.geometry.Pos;
 
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -25,6 +29,7 @@ public class InputSystem extends EntitySystem {
     private static final short PLAYER_MOVEMENT_DISTANCE = 1;
 
     private Entity playerEntity;
+    private ImmutableArray<Entity> blockingEntities;
 
     private RenderBuffer buffer;
 
@@ -34,6 +39,8 @@ public class InputSystem extends EntitySystem {
 
     public void addedToEngine(Engine engine) {
         playerEntity = engine.getEntitiesFor(Family.all(PlayerComponent.class, PositionComponent.class).get()).first();
+        blockingEntities = engine.getEntitiesFor(Family.all(LocalOnlyComponent.class,
+                BlocksMovementComponent.class, PositionComponent.class).get());
     }
 
     public SceneChangeEvent receiveInput(InputEvent event) {
@@ -68,8 +75,22 @@ public class InputSystem extends EntitySystem {
 
     private void movePlayer(int dx, int dy) {
         PositionComponent positionComponent = ComponentMappers.positionMapper.get(playerEntity);
-        positionComponent.setX(positionComponent.getX() + (dx * PLAYER_MOVEMENT_DISTANCE));
-        positionComponent.setY(positionComponent.getY() + (dy * PLAYER_MOVEMENT_DISTANCE));
+        long newPlayerX = positionComponent.getX() + (dx * PLAYER_MOVEMENT_DISTANCE);
+        long newPlayerY = positionComponent.getY() + (dy * PLAYER_MOVEMENT_DISTANCE);
+        if(playerMovementIsValid(newPlayerX, newPlayerY)) {
+            positionComponent.setX(newPlayerX);
+            positionComponent.setY(newPlayerY);
+        }
+    }
+
+    private boolean playerMovementIsValid(long x, long y) {
+        for(Entity blockingEntity : blockingEntities) {
+            PositionComponent blockerPosition = ComponentMappers.positionMapper.get(blockingEntity);
+            if(blockerPosition.getX() == x && blockerPosition.getY() == y) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private SceneChangeEvent createQuitMenuSceneEvent() {
