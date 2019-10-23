@@ -27,7 +27,8 @@ import java.util.stream.Stream;
 
 public class RenderSystem extends EntitySystem {
 
-    private static final Color MAX_NEGATIVE_DELTA_ELEVATION_COLOR = new Color(180, 255, 255);
+    private static final int SHADOW_OPACITY = 100;
+    private static final Color MAX_NEGATIVE_DELTA_ELEVATION_COLOR = new Color(100, 255, 255);
     private static final Color MAX_POSITIVE_DELTA_ELEVATION_COLOR = new Color(0, 0, 0);
     private static final String COLOR_MAP_IMAGE_URL = "WorldColorMap.bmp";
 
@@ -128,30 +129,42 @@ public class RenderSystem extends EntitySystem {
     }
 
     private void renderEntitiesInView(ViewFrame viewFrame) {
+        List<Entity> priorityEntities = new ArrayList<>();
         for(Entity entity: renderableEntities) {
-            PositionComponent position = ComponentMappers.positionMapper.get(entity);
-            GraphicsComponent graphics = ComponentMappers.graphicsMapper.get(entity);
-
-            if(!viewFrame.isLocalFrame() && ComponentMappers.localOnlyMapper.get(entity) != null) {
-                continue;
+            if(ComponentMappers.playerMapper.has(entity)) {
+                priorityEntities.add(entity);
+            } else {
+                renderEntity(viewFrame, entity);
             }
+        }
+        for(Entity priorityEntity: priorityEntities) {
+            renderEntity(viewFrame, priorityEntity);
+        }
+    }
 
-            if (position.getX() >= viewFrame.getOffsetWorldX() &&
-                    position.getY() >= viewFrame.getOffsetWorldY() &&
-                    position.getX() < viewFrame.getOffsetWorldX() + (viewFrame.getPanelBounds().getWidth() * viewFrame.getTileSize()) &&
-                    position.getY() < viewFrame.getOffsetWorldY() + (viewFrame.getPanelBounds().getHeight() * viewFrame.getTileSize())) {
-                //Entity is in frame, render it.  Make sure to convert properly between screen coords and world coords!!!
-                if (graphics.getBgColor() == null) {
-                    buffer.write(graphics.getCharacter(),
-                            viewFrame.getPanelBounds().getX() + (int) ((position.getX() - viewFrame.getOffsetWorldX()) / viewFrame.getTileSize()),
-                            viewFrame.getPanelBounds().getY() + (int) ((position.getY() - viewFrame.getOffsetWorldY()) / viewFrame.getTileSize()),
-                            graphics.getFgColor(), new Color(0f, 0f, 0f, 0f));
-                } else {
-                    buffer.write(graphics.getCharacter(),
-                            viewFrame.getPanelBounds().getX() + (int) ((position.getX() - viewFrame.getOffsetWorldX()) / viewFrame.getTileSize()),
-                            viewFrame.getPanelBounds().getY() + (int) ((position.getY() - viewFrame.getOffsetWorldY()) / viewFrame.getTileSize()),
-                            graphics.getFgColor(), graphics.getBgColor());
-                }
+    private void renderEntity(ViewFrame viewFrame, Entity entity) {
+        PositionComponent position = ComponentMappers.positionMapper.get(entity);
+        GraphicsComponent graphics = ComponentMappers.graphicsMapper.get(entity);
+
+        if(!viewFrame.isLocalFrame() && ComponentMappers.localOnlyMapper.has(entity)) {
+            return;
+        }
+
+        if (position.getX() >= viewFrame.getOffsetWorldX() &&
+                position.getY() >= viewFrame.getOffsetWorldY() &&
+                position.getX() < viewFrame.getOffsetWorldX() + (viewFrame.getPanelBounds().getWidth() * viewFrame.getTileSize()) &&
+                position.getY() < viewFrame.getOffsetWorldY() + (viewFrame.getPanelBounds().getHeight() * viewFrame.getTileSize())) {
+            //Entity is in frame, render it.  Make sure to convert properly between screen coords and world coords!!!
+            if (graphics.getBgColor() == null) {
+                buffer.write(graphics.getCharacter(),
+                        viewFrame.getPanelBounds().getX() + (int) ((position.getX() - viewFrame.getOffsetWorldX()) / viewFrame.getTileSize()),
+                        viewFrame.getPanelBounds().getY() + (int) ((position.getY() - viewFrame.getOffsetWorldY()) / viewFrame.getTileSize()),
+                        graphics.getFgColor(), new Color(0f, 0f, 0f, 0f));
+            } else {
+                buffer.write(graphics.getCharacter(),
+                        viewFrame.getPanelBounds().getX() + (int) ((position.getX() - viewFrame.getOffsetWorldX()) / viewFrame.getTileSize()),
+                        viewFrame.getPanelBounds().getY() + (int) ((position.getY() - viewFrame.getOffsetWorldY()) / viewFrame.getTileSize()),
+                        graphics.getFgColor(), graphics.getBgColor());
             }
         }
     }
@@ -200,7 +213,7 @@ public class RenderSystem extends EntitySystem {
                 buffer.write((char) 0,
                         viewFrame.getPanelBounds().getX() + (int) ((point.getX() - viewFrame.getOffsetWorldX()) / viewFrame.getTileSize()),
                         viewFrame.getPanelBounds().getY() + (int) ((point.getY() - viewFrame.getOffsetWorldY()) / viewFrame.getTileSize()),
-                        Color.RED, new Color(0, 0, 0, 255));
+                        Color.RED, new Color(0, 0, 0, SHADOW_OPACITY));
             }
         }
 
