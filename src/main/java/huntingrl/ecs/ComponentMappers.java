@@ -9,5 +9,7 @@ public class ComponentMappers {
     public static final ComponentMapper<LocalOnlyComponent> localOnlyMapper = ComponentMapper.getFor(LocalOnlyComponent.class);
     public static final ComponentMapper<CastsShadowComponent> castsShadowMapper = ComponentMapper.getFor(CastsShadowComponent.class);
     public static final ComponentMapper<PlayerComponent> playerMapper = ComponentMapper.getFor(PlayerComponent.class);
+    public static final ComponentMapper<WanderAIComponent> wanderAIMapper = ComponentMapper.getFor(WanderAIComponent.class);
+
 
 }

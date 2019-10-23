@@ -182,7 +182,7 @@ public class World {
     private Entity generateTree(Point point) {
         Entity entity = new Entity();
         entity.add(new PositionComponent(point.getX(), point.getY()));
-        entity.add(new GraphicsComponent((char) 79, new Color(70, 45, 0), null));
+        entity.add(new GraphicsComponent((char) 79, new Color(70, 45, 0), null, (short) 1));
         entity.add(new LocalOnlyComponent());
         entity.add(new BlocksMovementComponent());
         entity.add(new CastsShadowComponent());
@@ -193,7 +193,7 @@ public class World {
         Entity entity = new Entity();
         entity.add(new PositionComponent(point.getX(), point.getY()));
         entity.add(new GraphicsComponent((char) 5,
-                new Color(0, 60, 0), null));
+                new Color(0, 60, 0), null, (short) 0));
         entity.add(new LocalOnlyComponent());
         return entity;
     }
@@ -204,7 +204,7 @@ public class World {
         entity.add(new GraphicsComponent((char) 34,
                 new Color(0,
                         200,
-                        0), null));
+                        0), null, (short) 0));
         entity.add(new LocalOnlyComponent());
         return entity;
     }

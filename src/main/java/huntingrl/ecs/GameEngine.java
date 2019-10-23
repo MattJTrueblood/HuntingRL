@@ -2,14 +2,8 @@ package huntingrl.ecs;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import huntingrl.ecs.components.GraphicsComponent;
-import huntingrl.ecs.components.PlayerComponent;
-import huntingrl.ecs.components.PositionComponent;
-import huntingrl.ecs.components.WorldComponent;
-import huntingrl.ecs.systems.FrameSystem;
-import huntingrl.ecs.systems.InputSystem;
-import huntingrl.ecs.systems.RenderSystem;
-import huntingrl.ecs.systems.WorldChunkingSystem;
+import huntingrl.ecs.components.*;
+import huntingrl.ecs.systems.*;
 import huntingrl.view.RenderBuffer;
 import huntingrl.view.SceneChangeEvent;
 import huntingrl.view.panel.ViewFrame;
@@ -17,6 +11,7 @@ import huntingrl.world.World;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -32,6 +27,34 @@ public class GameEngine {
         gameEngine.addSystem(new RenderSystem(buffer));
         gameEngine.addSystem(new InputSystem(buffer));
         gameEngine.addSystem(new FrameSystem());
+        gameEngine.addSystem(new AIControllerSystem());
+        addACoupleOfDeer();
+    }
+
+    private void addACoupleOfDeer() {
+        for(int i = 0; i < 3; i++) {
+            Entity deer = new Entity();
+            deer.add(new PositionComponent(
+                    ThreadLocalRandom.current().nextLong(-10, 10),
+                    ThreadLocalRandom.current().nextLong(-10, 10)));
+            deer.add(new GraphicsComponent(
+                    (char) 100,
+                    new Color(235, 177, 54),
+                    null, (short) 10));
+            deer.add(WanderAIComponent.builder()
+                    .currentPath(new ArrayList<>())
+                    .maxWaitTurns(40)
+                    .minWaitTurns(10)
+                    .maxWanderDistance(100)
+                    .minWanderDistance(30)
+                    .movementSpeed(1)
+                    .turnsUntilNextWander(5)
+                    .build());
+            deer.add(new LocalOnlyComponent());
+            deer.add(new BlocksMovementComponent());
+            deer.add(new PersistOutsideLocalChunksComponent());
+            gameEngine.addEntity(deer);
+        }
     }
 
     private void addWorld() {
@@ -45,6 +68,7 @@ public class GameEngine {
         player.add(GraphicsComponent.builder()
                 .character((char) 2)
                 .fgColor(new Color(255, 255, 0, 255))
+                .zIndex((short) 100)
                 .build());
         player.add(new PlayerComponent());
         player.add(PositionComponent.builder().x(0).y(0).build());
@@ -52,7 +76,11 @@ public class GameEngine {
     }
 
     public SceneChangeEvent receiveInput(InputEvent inputEvent) {
-        return gameEngine.getSystem(InputSystem.class).receiveInput(inputEvent);
+        SceneChangeEvent event = gameEngine.getSystem(InputSystem.class).receiveInput(inputEvent);
+        if(event == null) {
+            update(1);
+        }
+        return event;
     }
 
     public void renderInView(ViewFrame viewFrame) {

@@ -16,6 +16,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import java.awt.*;
@@ -129,16 +131,10 @@ public class RenderSystem extends EntitySystem {
     }
 
     private void renderEntitiesInView(ViewFrame viewFrame) {
-        List<Entity> priorityEntities = new ArrayList<>();
-        for(Entity entity: renderableEntities) {
-            if(ComponentMappers.playerMapper.has(entity)) {
-                priorityEntities.add(entity);
-            } else {
-                renderEntity(viewFrame, entity);
-            }
-        }
-        for(Entity priorityEntity: priorityEntities) {
-            renderEntity(viewFrame, priorityEntity);
+        List<Entity> entities = Arrays.asList(renderableEntities.toArray());
+        entities.sort(Comparator.comparingInt((Entity entity) -> ComponentMappers.graphicsMapper.get(entity).getZIndex()));
+        for(Entity entity: entities) {
+            renderEntity(viewFrame, entity);
         }
     }
 

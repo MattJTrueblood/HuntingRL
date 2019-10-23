@@ -16,4 +16,5 @@ public class GraphicsComponent implements Component {
     private char character;
     private Color fgColor;
     private Color bgColor;
+    private short zIndex;
 }
