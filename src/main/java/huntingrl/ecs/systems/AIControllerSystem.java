@@ -2,13 +2,16 @@ package huntingrl.ecs.systems;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 import huntingrl.ecs.ComponentMappers;
 import huntingrl.ecs.components.*;
+import huntingrl.util.Math.MathUtils;
+import huntingrl.util.Math.Point;
 
+import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class AIControllerSystem extends IteratingSystem {
@@ -28,15 +31,48 @@ public class AIControllerSystem extends IteratingSystem {
     }
 
     public void processEntity(Entity entity, float deltaTime) {
-        //WanderAIComponent wanderAI = ComponentMappers.wanderAIMapper.get(entity);
+        WanderAIComponent wanderAI = ComponentMappers.wanderAIMapper.get(entity);
+
+        if(!wanderAI.getCurrentPath().isEmpty()) {
+            Point nextPoint = wanderAI.getCurrentPath().removeFirst();
+            boolean success = attemptMove(entity, nextPoint.getX(), nextPoint.getY());
+            if(wanderAI.getCurrentPath().isEmpty() && success) {
+                wanderAI.setTurnsUntilNextWander(ThreadLocalRandom.current().nextInt(
+                        wanderAI.getMinWaitTurns(), wanderAI.getMaxWaitTurns() + 1));
+                wanderAI.setCurrentPath(new ArrayDeque<>());
+            }
+        }
+        else if(wanderAI.getTurnsUntilNextWander() == 0) {
+            PositionComponent position = ComponentMappers.positionMapper.get(entity);
+            long goalX = position.getX() + ThreadLocalRandom.current().nextLong(
+                    wanderAI.getMinWanderDistance(), wanderAI.getMaxWanderDistance() * 2)
+                    - ((wanderAI.getMaxWanderDistance() + wanderAI.getMinWanderDistance()) / 2);
+            long goalY = position.getY() + ThreadLocalRandom.current().nextLong(
+                    wanderAI.getMinWanderDistance(), wanderAI.getMaxWanderDistance() * 2)
+                    - ((wanderAI.getMaxWanderDistance() + wanderAI.getMinWanderDistance()) / 2);
+            Point[] line = MathUtils.bresenhamLine(new Point(position.getX(), position.getY()),
+                    new Point(goalX, goalY));
+            wanderAI.setCurrentPath(new ArrayDeque<>(Arrays.asList(line)));
+            wanderAI.getCurrentPath().removeFirst(); //first point overlaps with self.
+        }
+        else {
+
+            wanderAI.setTurnsUntilNextWander(wanderAI.getTurnsUntilNextWander() - 1);
+        }
+    }
+
+    private boolean attemptMove(Entity entity, long newX, long newY) {
         PositionComponent position = ComponentMappers.positionMapper.get(entity);
-        long dx = ThreadLocalRandom.current().nextLong(3)-1;
-        long dy = ThreadLocalRandom.current().nextLong(3)-1;
-        long newAiX = position.getX() + dx;
-        long newAiY = position.getY() + dy;
-        if(moveIsValid(newAiX, newAiY)) {
-            position.setX(newAiX);
-            position.setY(newAiY);
+        if(moveIsValid(newX, newY)) {
+            position.setX(newX);
+            position.setY(newY);
+            return true;
+        }
+        else {
+            WanderAIComponent wanderAI = ComponentMappers.wanderAIMapper.get(entity);
+            wanderAI.setCurrentPath(new ArrayDeque<>());
+            wanderAI.setTurnsUntilNextWander(0);
+            return false;
         }
     }
 

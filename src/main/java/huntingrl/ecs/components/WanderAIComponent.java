@@ -7,7 +7,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Deque;
 import java.util.List;
+import java.util.Queue;
 
 @Getter
 @Setter
@@ -19,5 +21,5 @@ public class WanderAIComponent implements Component {
     final int maxWaitTurns;
     final int minWanderDistance;
     final int maxWanderDistance;
-    List<Point> currentPath;
+    Deque<Point> currentPath;
 }

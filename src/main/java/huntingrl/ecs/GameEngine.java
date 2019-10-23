@@ -11,6 +11,7 @@ import huntingrl.world.World;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -42,11 +43,11 @@ public class GameEngine {
                     new Color(235, 177, 54),
                     null, (short) 10));
             deer.add(WanderAIComponent.builder()
-                    .currentPath(new ArrayList<>())
-                    .maxWaitTurns(40)
+                    .currentPath(new ArrayDeque<>())
+                    .maxWaitTurns(20)
                     .minWaitTurns(10)
-                    .maxWanderDistance(100)
-                    .minWanderDistance(30)
+                    .maxWanderDistance(20)
+                    .minWanderDistance(10)
                     .movementSpeed(1)
                     .turnsUntilNextWander(5)
                     .build());
