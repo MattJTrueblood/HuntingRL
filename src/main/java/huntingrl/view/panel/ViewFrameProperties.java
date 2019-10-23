@@ -12,4 +12,5 @@ public class ViewFrameProperties {
     boolean localFrame; //entities will only be loaded on chunks in a local frame.  Only 1 local frame at a time please!
     int terrainColorModPositiveSoftness;  //must be 1 or greater
     int terrainColorModNegativeSoftness;  //must be 1 or greater
+    boolean terrainColorModLocked;
 }

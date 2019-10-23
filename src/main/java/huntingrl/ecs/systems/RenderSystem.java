@@ -10,6 +10,12 @@ import huntingrl.view.panel.ViewFrame;
 import huntingrl.world.World;
 import huntingrl.world.WorldPoint;
 import huntingrl.util.Math.Point;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 import java.awt.*;
@@ -23,6 +29,7 @@ public class RenderSystem extends EntitySystem {
 
     private static final Color MAX_NEGATIVE_DELTA_ELEVATION_COLOR = new Color(180, 255, 255);
     private static final Color MAX_POSITIVE_DELTA_ELEVATION_COLOR = new Color(0, 0, 0);
+    private static final String COLOR_MAP_IMAGE_URL = "WorldColorMap.bmp";
 
     private ImmutableArray<Entity> renderableEntities;
     private ImmutableArray<Entity> shadowingEntities;
@@ -30,9 +37,29 @@ public class RenderSystem extends EntitySystem {
     private WorldChunkingSystem worldChunkingSystem;
 
     private RenderBuffer buffer;
+    private int[][] worldColorMapPixels;
 
     public RenderSystem(RenderBuffer buffer) {
         this.buffer = buffer;
+        loadWorldColorMap();
+    }
+
+    private void loadWorldColorMap() {
+        BufferedImage colorMapImage;
+        try {
+            URL colorMapUrl = this.getClass().getClassLoader().getResource(COLOR_MAP_IMAGE_URL);
+            colorMapImage = ImageIO.read(colorMapUrl);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        worldColorMapPixels = new int[255][255];
+        for(int i = 0; i < 255; i++) {
+            for(int j = 0; j < 255; j++) {
+                worldColorMapPixels[i][j] = colorMapImage.getRGB(i, j);
+            }
+        }
     }
 
     @Override
@@ -60,13 +87,14 @@ public class RenderSystem extends EntitySystem {
                 int elevationAtIJ = worldPointsInFrame[i][j].getElevation();
                 boolean ijIsUnderwater = elevationAtIJ < World.WATER_ELEVATION;
 
-                Color terrainColor = ijIsUnderwater
-                        ? new Color(0, 64, 200)
-                        : new Color(0, 100, 0);
+                Color terrainColor = getBaseTerrainColor(worldPointsInFrame[i][j]);
 
                 if(!ijIsUnderwater) {
                     int playerElevation = worldChunkingSystem.getWorldPointAt(playerPosition.getX(), playerPosition.getY(), viewFrame)
                             .getElevation();
+                    if(viewFrame.getProperties().isTerrainColorModLocked()) {
+                        playerElevation = World.WATER_ELEVATION;
+                    }
                     int deltaElevation = elevationAtIJ - playerElevation;
                     if (deltaElevation > 0) {
                         terrainColor = modifyColorByDeltaElevation(terrainColor, MAX_POSITIVE_DELTA_ELEVATION_COLOR,
@@ -82,6 +110,11 @@ public class RenderSystem extends EntitySystem {
                         Color.GRAY, terrainColor);
             }
         }
+    }
+
+    private Color getBaseTerrainColor(WorldPoint point) {
+        int rgb = worldColorMapPixels[(short) (point.getHumidity() * 255)][point.getElevation()];
+        return new Color(rgb);
     }
 
     private Color modifyColorByDeltaElevation(Color baseColor, Color goalColor, int deltaElevation, int softness) {

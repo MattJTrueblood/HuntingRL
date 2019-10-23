@@ -9,4 +9,5 @@ import lombok.Getter;
 public class WorldPoint {
     Point coords;
     private short elevation;
+    private double humidity;
 }
