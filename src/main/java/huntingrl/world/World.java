@@ -12,24 +12,26 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Getter
 public class World {
 
-    private final int elevationSeed;
-    private final int treeSeed;
-    private final int humiditySeed;
-    private final int shrubSeed;
-    private final int grassSeed;
+    private final int masterSeed;
+    private int elevationSeed;
+    private int treeSeed;
+    private int humiditySeed;
+    private int shrubSeed;
+    private int grassSeed;
 
     public static final short WATER_ELEVATION = 50;
 
     private static final double[] NOISE_FREQUENCIES = {0.15, 0.5, 1, 5, 10, 20, 50};
     private static final double[] NOISE_AMPLITUDES = {0.65, 0.2, 0.05, 0.01, 0.005, 0.002, 0.001}; //try not to let the sum of these exceed 1.0
     private static final double NOISE_REDISTRIBUTION_FACTOR = 2;
-    private static final double MAX_ELEVATION = 255;
+    private static final int MAX_ELEVATION = 255;
     private static final double WORLD_SCALE_MOD = 256;
     private static final long TREE_DISTANCE_AT_MAX_HUMIDITY = 2;
     private static final long TREE_DISTANCE_AT_MIN_HUMIDITY = 8;
@@ -42,13 +44,16 @@ public class World {
     private static final long GRASS_MIN_DISTANCE = 1;
     private static final double GRASS_NOISE_FREQUENCY = 0.5;
 
-
-    public World(int seed) {
-        this.elevationSeed = seed;
-        treeSeed = elevationSeed + 100;
-        humiditySeed = treeSeed + 100;
-        shrubSeed = humiditySeed + 100;
-        grassSeed = shrubSeed + 100;
+    public World() {
+        this.elevationSeed = ThreadLocalRandom.current().nextInt();
+        while(elevationAtCoords(0, 0) < WATER_ELEVATION) {
+            this.elevationSeed = ThreadLocalRandom.current().nextInt();
+        }
+        this.masterSeed = elevationSeed;
+        treeSeed = masterSeed + 100;
+        humiditySeed = masterSeed + 200;
+        shrubSeed = masterSeed + 300;
+        grassSeed = masterSeed + 400;
     }
 
     public WorldPoint pointAt(long x, long y, short scale) {
@@ -57,12 +62,12 @@ public class World {
                 humidityAtCoords(x + (scale / 2), y + (scale / 2)));
     }
 
-    private double elevationAtCoords(long x, long y){
+    private int elevationAtCoords(long x, long y){
         double elevationAtPoint = generateValueFromHarmonicNoiseAtPoint(x, y, elevationSeed);
         elevationAtPoint = Math.pow(elevationAtPoint * 2, NOISE_REDISTRIBUTION_FACTOR) / Math.pow(2, NOISE_REDISTRIBUTION_FACTOR);
 
         //convert 0.0-1.0 elevation into world elevation
-        return elevationAtPoint * MAX_ELEVATION;
+        return (int)(elevationAtPoint * MAX_ELEVATION);
     }
 
     private double generateValueFromHarmonicNoiseAtPoint(long x, long y, int seed) {
