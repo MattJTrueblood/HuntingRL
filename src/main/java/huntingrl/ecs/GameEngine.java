@@ -53,7 +53,6 @@ public class GameEngine {
                     .build());
             deer.add(new LocalOnlyComponent());
             deer.add(new BlocksMovementComponent());
-            deer.add(new PersistOutsideLocalChunksComponent());
             gameEngine.addEntity(deer);
         }
     }
@@ -72,7 +71,7 @@ public class GameEngine {
                 .zIndex((short) 100)
                 .build());
         player.add(new PlayerComponent());
-        player.add(PositionComponent.builder().x(0).y(0).build());
+        player.add(PositionComponent.builder().x(World.WORLD_WIDTH / 2).y(World.WORLD_HEIGHT / 2).build());
         gameEngine.addEntity(player);
     }
 

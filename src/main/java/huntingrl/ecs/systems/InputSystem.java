@@ -26,7 +26,7 @@ public class InputSystem extends EntitySystem {
     private static final int RIGHT_KEYCODE = KeyEvent.VK_RIGHT;
     private static final int QUIT_KEYCODE = KeyEvent.VK_ESCAPE;
 
-    private static final short PLAYER_MOVEMENT_DISTANCE = 1;
+    private static final short PLAYER_MOVEMENT_DISTANCE = 256;
 
     private Entity playerEntity;
     private ImmutableArray<Entity> blockingEntities;
@@ -81,6 +81,7 @@ public class InputSystem extends EntitySystem {
             positionComponent.setX(newPlayerX);
             positionComponent.setY(newPlayerY);
         }
+        System.out.println(newPlayerX + ", " + newPlayerY);
     }
 
     private boolean playerMovementIsValid(long x, long y) {

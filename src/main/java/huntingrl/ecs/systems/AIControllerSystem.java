@@ -34,31 +34,42 @@ public class AIControllerSystem extends IteratingSystem {
         WanderAIComponent wanderAI = ComponentMappers.wanderAIMapper.get(entity);
 
         if(!wanderAI.getCurrentPath().isEmpty()) {
-            Point nextPoint = wanderAI.getCurrentPath().removeFirst();
-            boolean success = attemptMove(entity, nextPoint.getX(), nextPoint.getY());
-            if(wanderAI.getCurrentPath().isEmpty() && success) {
-                wanderAI.setTurnsUntilNextWander(ThreadLocalRandom.current().nextInt(
-                        wanderAI.getMinWaitTurns(), wanderAI.getMaxWaitTurns() + 1));
-                wanderAI.setCurrentPath(new ArrayDeque<>());
-            }
+            walkAlongPath(wanderAI, entity);
         }
         else if(wanderAI.getTurnsUntilNextWander() == 0) {
-            PositionComponent position = ComponentMappers.positionMapper.get(entity);
-            long goalX = position.getX() + ThreadLocalRandom.current().nextLong(
-                    wanderAI.getMinWanderDistance(), wanderAI.getMaxWanderDistance() * 2)
-                    - ((wanderAI.getMaxWanderDistance() + wanderAI.getMinWanderDistance()) / 2);
-            long goalY = position.getY() + ThreadLocalRandom.current().nextLong(
-                    wanderAI.getMinWanderDistance(), wanderAI.getMaxWanderDistance() * 2)
-                    - ((wanderAI.getMaxWanderDistance() + wanderAI.getMinWanderDistance()) / 2);
-            Point[] line = MathUtils.bresenhamLine(new Point(position.getX(), position.getY()),
-                    new Point(goalX, goalY));
-            wanderAI.setCurrentPath(new ArrayDeque<>(Arrays.asList(line)));
-            wanderAI.getCurrentPath().removeFirst(); //first point overlaps with self.
+            beginNewPath(wanderAI, entity);
         }
         else {
-
-            wanderAI.setTurnsUntilNextWander(wanderAI.getTurnsUntilNextWander() - 1);
+            decrementWaitCounter(wanderAI);
         }
+    }
+
+    private void walkAlongPath(WanderAIComponent wanderAI, Entity entity) {
+        Point nextPoint = wanderAI.getCurrentPath().removeFirst();
+        boolean success = attemptMove(entity, nextPoint.getX(), nextPoint.getY());
+        if(wanderAI.getCurrentPath().isEmpty() && success) {
+            wanderAI.setTurnsUntilNextWander(ThreadLocalRandom.current().nextInt(
+                    wanderAI.getMinWaitTurns(), wanderAI.getMaxWaitTurns() + 1));
+            wanderAI.setCurrentPath(new ArrayDeque<>());
+        }
+    }
+
+    private void beginNewPath(WanderAIComponent wanderAI, Entity entity) {
+        PositionComponent position = ComponentMappers.positionMapper.get(entity);
+        long goalX = position.getX() + ThreadLocalRandom.current().nextLong(
+                wanderAI.getMinWanderDistance(), wanderAI.getMaxWanderDistance() * 2)
+                - ((wanderAI.getMaxWanderDistance() + wanderAI.getMinWanderDistance()) / 2);
+        long goalY = position.getY() + ThreadLocalRandom.current().nextLong(
+                wanderAI.getMinWanderDistance(), wanderAI.getMaxWanderDistance() * 2)
+                - ((wanderAI.getMaxWanderDistance() + wanderAI.getMinWanderDistance()) / 2);
+        Point[] line = MathUtils.bresenhamLine(new Point(position.getX(), position.getY()),
+                new Point(goalX, goalY));
+        wanderAI.setCurrentPath(new ArrayDeque<>(Arrays.asList(line)));
+        wanderAI.getCurrentPath().removeFirst(); //first point overlaps with self.
+    }
+
+    private void decrementWaitCounter(WanderAIComponent wanderAI) {
+        wanderAI.setTurnsUntilNextWander(wanderAI.getTurnsUntilNextWander() - 1);
     }
 
     private boolean attemptMove(Entity entity, long newX, long newY) {

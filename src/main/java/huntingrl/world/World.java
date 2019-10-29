@@ -38,6 +38,9 @@ public class World {
     private static final double MIN_HUMIDITY_FOR_TREES_TO_APPEAR = 0.15;
     private static final double TREE_NOISE_FREQUENCY = 0.5;
 
+    public static final long WORLD_WIDTH = 7000;
+    public static final long WORLD_HEIGHT = 7000;
+
     private static final long SHRUB_MIN_DISTANCE = 3;
     private static final double SHRUB_NOISE_FREQUENCY = 0.5;
 
@@ -67,7 +70,32 @@ public class World {
         elevationAtPoint = Math.pow(elevationAtPoint * 2, NOISE_REDISTRIBUTION_FACTOR) / Math.pow(2, NOISE_REDISTRIBUTION_FACTOR);
 
         //convert 0.0-1.0 elevation into world elevation
-        return (int)(elevationAtPoint * MAX_ELEVATION);
+        return (int)(transformElevation(x, y, elevationAtPoint) * MAX_ELEVATION);
+    }
+
+    private double transformElevation(long x, long y, double elevation) {
+        double distanceFromCenter = Math.sqrt(Math.pow((double) x - ((double) WORLD_WIDTH / 2), 2)
+                + Math.pow((double) y - ((double)WORLD_HEIGHT / 2), 2));
+
+        double worldHeightOverTwo = (double) WORLD_HEIGHT / 2;
+
+        if(distanceFromCenter > worldHeightOverTwo) {
+            return (double) 0.0; //TODO:  fix freaky spooky infinitely x and y always zero bug!!!!!!!!!! TODO TODO TODO
+        }
+
+        double up = upperTransform(distanceFromCenter);
+        double down = lowerTransform(distanceFromCenter);
+
+        double transformedElevation = down + elevation * (up - down);
+        return transformedElevation > 0 ? transformedElevation : 0;
+    }
+
+    private double upperTransform(double distance) {
+        return Math.cos(((Math.PI/2) * distance) / ((double) WORLD_HEIGHT/2) ) * (1 - ((double) WATER_ELEVATION / (double) MAX_ELEVATION)) + ((double) WATER_ELEVATION / (double) MAX_ELEVATION);
+    }
+
+    private double lowerTransform(double distance) {
+        return Math.cos(((Math.PI/2) * distance) / ((double) WORLD_HEIGHT/2) ) * ((double) WATER_ELEVATION / (double) MAX_ELEVATION);
     }
 
     private double generateValueFromHarmonicNoiseAtPoint(long x, long y, int seed) {

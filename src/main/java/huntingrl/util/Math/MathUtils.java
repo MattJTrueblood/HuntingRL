@@ -53,4 +53,12 @@ public class MathUtils {
         }
         return points.toArray(new Point[0]);
     }
+
+    /*
+        Many publicly available wildlife density, range, territory statistics in the US are measured in acres.  This
+        game uses meters to measure distances.  This function here helps with this.
+     */
+    public static double squareMetersToAcres(double squareMeters) {
+        return squareMeters * 0.000247105;
+    }
 }

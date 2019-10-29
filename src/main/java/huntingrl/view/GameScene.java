@@ -19,6 +19,7 @@ public class GameScene extends MultiPanelScene {
     public void init() {
         engine = new GameEngine(buffer);
 
+        /*
         //zoomed out panel 1
         addPanel( new GamePanel(buffer, 1,1,
                 (Constants.TERMINAL_WIDTH / 2) - 1, (Constants.TERMINAL_HEIGHT / 2) - 1,
@@ -32,13 +33,15 @@ public class GameScene extends MultiPanelScene {
                 (Constants.TERMINAL_WIDTH / 2) - 2, Constants.TERMINAL_HEIGHT - 2,
                 engine, new ViewFrameProperties((short) 1, true, 5, 2, false)));
 
-        /*
-        addPanel( new GamePanel(buffer, 1,1,
-                Constants.TERMINAL_WIDTH - 2, Constants.TERMINAL_HEIGHT - 2,
-                engine, new ViewFrameProperties((short) 128, false, 100,
-                100, true)));
 
          */
+
+        addPanel( new GamePanel(buffer, 1,1,
+                Constants.TERMINAL_WIDTH - 2, Constants.TERMINAL_HEIGHT - 2,
+                engine, new ViewFrameProperties((short) 256, false, 100,
+                100, true)));
+
+
     }
 
     @Override
